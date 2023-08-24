@@ -1,0 +1,20 @@
+﻿  Entity.cpp
+  CollisionDetection.cpp
+  Map.cpp
+C:\Users\user\Development\JumpGuy\JumpGuy\Src\Map\Map.cpp(110,52): warning C4018: '<': signed/unsigned mismatch
+C:\Users\user\Development\JumpGuy\JumpGuy\Src\Map\Map.cpp(118,24): warning C4018: '<': signed/unsigned mismatch
+  Line.cpp
+  Level.cpp
+  Graphics.cpp
+  Mouse.cpp
+  Engine.cpp
+  Keyboard.cpp
+  Sprite.cpp
+  Player.cpp
+  Game.cpp
+  DirectX9.cpp
+  WinMain.cpp
+  XAudio2.cpp
+  Timer.cpp
+  Generating Code...
+  JumpGuy.vcxproj -> C:\Users\user\Development\JumpGuy\Debug\JumpGuy.exe
