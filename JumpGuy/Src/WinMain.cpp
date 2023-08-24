@@ -1,4 +1,8 @@
-#include "Includes.h"
+#include "Engine/Engine.h"
+#include "Game/Game.h"
+#include "Timer/Timer.h"
+
+// exceptions in constructors
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -10,9 +14,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	freopen_s(&fDummy, "CONOUT$", "w", stdout);
 #endif
 
-	srand((unsigned int)time(NULL));
-	Engine* engine = new Engine(hInstance);
+	srand(time(NULL));
 
+	std::shared_ptr<Engine> engine =  std::make_shared<Engine>(hInstance);
 	// After engine instance is created, draw a loading screen, because reading collision data from file will take some time
 	engine->GetGraphicsPtr()->ClearScreen(0, 0, 0);
 	engine->GetDirectX9Ptr()->GetDevice()->BeginScene();
@@ -23,11 +27,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	engine->GetDirectX9Ptr()->GetDevice()->EndScene();
 	engine->GetDirectX9Ptr()->GetDevice()->Present(NULL, NULL, NULL, NULL);
 
-	Timer* timer = new Timer();
-	Game* game = new Game(engine);
+	std::shared_ptr<Timer> timer = std::make_shared<Timer>();
+	std::shared_ptr<Game> game = std::make_shared<Game>(engine);
 	MSG msg;
 	ZeroMemory(&msg, sizeof(msg));
-	
+
 	while (msg.message != WM_QUIT)
 	{
 		if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
@@ -55,10 +59,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	fclose(fDummy);
 	delete fDummy;
 #endif
-
-	delete game;
-	delete timer;
-	delete engine;
 
 	return 0;
 }

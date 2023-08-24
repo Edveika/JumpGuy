@@ -1,4 +1,4 @@
-#include "../Includes.h"
+#include "Line.h"
 
 int Line::GetLineType()
 {

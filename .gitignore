@@ -1,0 +1,11 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/JumpGuy
+/Debug
+/JumpGuy/Debug
+/JumpGuy/Assets
+/JumpGuy/x64/Debug
+/JumpGuy/Release
+/Release

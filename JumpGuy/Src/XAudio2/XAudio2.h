@@ -1,4 +1,6 @@
 #pragma once
+#include <Windows.h>
+#include <XAudio2.h>
 
 #define fourccRIFF 'FFIR'
 #define fourccDATA 'atad'

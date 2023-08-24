@@ -1,15 +1,26 @@
 #pragma once
+#include <memory>
+#include <Windows.h>
+#include <vector>
+#include <string>
+#include <filesystem>
+#include <fstream>
+
+#include "../Player/Player.h"
+#include "../Engine/Engine.h"
+#include "../Level/Level.h"
+#include "../Line/Line.h"
 
 class Map
 {
 private:
-	Engine* _engine;
-	Level* _curLevel;
-	std::vector<Level*> _levels;
+	std::shared_ptr<Engine> _engine;
+	std::shared_ptr<Level> _curLevel;
+	std::vector<std::shared_ptr<Level>> _levels;
 	int _curLvlIndex;
 
 public:
-	Map(Engine* engine)
+	Map(std::shared_ptr<Engine> engine)
 	{
 		if (!std::filesystem::exists("Assets"))
 			MessageBoxA(NULL, "No Assets dir found!", NULL, NULL);
@@ -18,21 +29,13 @@ public:
 		InitLevels();
 		_curLevel = _levels[_curLvlIndex];
 	}
-	~Map()
-	{
-		delete _curLevel;
-		delete _engine;
-		for (size_t i = 0; i < _levels.size(); ++i)
-			delete _levels[i];
-	}
 
 public:
-	void Update(Player* player, float dt);
-	void Render(Player* player, float dt);
+	void Update(std::shared_ptr<Player> player, float dt);
+	void Render(std::shared_ptr<Player> player, float dt);
 
 	bool InitLevels();
-	Level* GetCurLevel(Player* player);
 
-	// Getters
-	Level* GetCurLevel() { return _curLevel; }
+	std::shared_ptr<Level> GetCurLevel(std::shared_ptr<Player> player);
+	std::shared_ptr<Level> GetCurLevel() { return _curLevel; }
 };

@@ -1,4 +1,4 @@
-#include "../Includes.h"
+#include "Map.h"
 
 Line GetLineFromStr(std::string str)
 {
@@ -82,7 +82,7 @@ bool Map::InitLevels()
 	{
 		if (tmp.substr(tmp.find_last_of(".") + 1) == "png")
 		{
-			Level* level = new Level(_engine, "Assets\\Levels\\" + tmp);
+			std::shared_ptr<Level> level = std::make_shared<Level>(_engine, "Assets\\Levels\\" + tmp);
 			_levels.push_back(level);
 		}
 		else
@@ -102,9 +102,9 @@ bool Map::InitLevels()
 	return true;
 }
 
-Level* Map::GetCurLevel(Player* player)
+std::shared_ptr<Level> Map::GetCurLevel(std::shared_ptr<Player> player)
 {
-	Level* lvl = _levels[_curLvlIndex];
+	std::shared_ptr<Level> lvl = _levels[_curLvlIndex];
 
 #ifdef _DEBUG
 	if (GetAsyncKeyState('P') & 1 && _curLvlIndex + 1 < _levels.size())
@@ -135,13 +135,13 @@ Level* Map::GetCurLevel(Player* player)
 	return lvl;
 }
 
-void Map::Update(Player* player, float dt)
+void Map::Update(std::shared_ptr<Player> player, float dt)
 {
 	_curLevel = GetCurLevel(player);
 	_curLevel->Update(player, dt);
 }
 
-void Map::Render(Player* player, float dt)
+void Map::Render(std::shared_ptr<Player> player, float dt)
 {
 	_curLevel->Render(player, dt);
 }

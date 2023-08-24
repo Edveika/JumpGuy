@@ -1,4 +1,6 @@
 #pragma once
+#include <Windows.h>
+#include <chrono>
 
 class Timer
 {
@@ -14,10 +16,6 @@ public:
 	{
 		_timePassed = 0.0f;
 		QueryPerformanceFrequency(&_timeFrequency);
-	}
-	~Timer()
-	{
-
 	}
 
 public:

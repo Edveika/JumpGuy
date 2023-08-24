@@ -1,4 +1,4 @@
-#include "../Includes.h"
+#include "CollisionDetection.h"
 
 bool CheckForLineToLineCollision(Line line, float x3, float y3, float x4, float y4)
 {
@@ -47,7 +47,7 @@ bool GetLineRect(Line line, float rx, float ry, RECT hitbox)
 	return false;
 }
 
-void CollisionDetection::GroundCheck(Player* player, std::vector<Line> lines)
+void CollisionDetection::GroundCheck(std::shared_ptr<Player> player, std::vector<Line> lines)
 {
 	player->SetIsInAir();
 	float playerLeft = player->GetCurPosition().x + player->GetHitboxLeft();
@@ -87,7 +87,7 @@ void CollisionDetection::GroundCheck(Player* player, std::vector<Line> lines)
 	}
 }
 
-void CollisionDetection::GetLineCollisionData(Player* player, Line& line)
+void CollisionDetection::GetLineCollisionData(std::shared_ptr<Player> player, Line& line)
 {
 	float playerLeft = player->GetCurPosition().x + player->GetHitboxLeft();
 	float playerRight = player->GetCurPosition().x + player->GetHitboxRight();
@@ -152,7 +152,7 @@ void CollisionDetection::GetLineCollisionData(Player* player, Line& line)
 	}
 }
 
-void CollisionDetection::PosCheck(Player* player, std::vector<Line> lines, float dt)
+void CollisionDetection::PosCheck(std::shared_ptr<Player> player, std::vector<Line> lines, float dt)
 {
 	player->SetMaxPosLeft(0);
 	player->SetMaxPosRight(0);
@@ -246,7 +246,7 @@ void CollisionDetection::PosCheck(Player* player, std::vector<Line> lines, float
 	}
 }
 
-Line CollisionDetection::GetPriorityCollision(Player* player, std::vector<Line> lines)
+Line CollisionDetection::GetPriorityCollision(std::shared_ptr<Player> player, std::vector<Line> lines)
 {
 	Line col;
 	float value = FLT_MAX;
@@ -314,7 +314,7 @@ Line CollisionDetection::GetPriorityCollision(Player* player, std::vector<Line> 
 	return col;
 }
 
-void CollisionDetection::ApplyCollisionLogic(Player* player, Line col, float dt)
+void CollisionDetection::ApplyCollisionLogic(std::shared_ptr<Player> player, Line col, float dt)
 {
 	if (col.GetCollisionLength() > 0.0f)
 	{
@@ -447,7 +447,7 @@ void CollisionDetection::ApplyCollisionLogic(Player* player, Line col, float dt)
 	}
 }
 
-void CollisionDetection::Update(Player* player, std::vector<Line> lines, float dt)
+void CollisionDetection::Update(std::shared_ptr<Player> player, std::vector<Line> lines, float dt)
 {
 	for (size_t i = 0; i < lines.size(); ++i)
 	{

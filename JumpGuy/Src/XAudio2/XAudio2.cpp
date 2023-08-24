@@ -1,4 +1,4 @@
-#include "../Includes.h"
+#include "XAudio2.h"
 
 bool XAudio2::CreateXAudio2Device()
 {
@@ -100,7 +100,7 @@ HRESULT XAudio2::ReadChunkData(HANDLE hFile, void* buffer, DWORD buffersize, DWO
 IXAudio2SourceVoice* XAudio2::LoadAudioData(LPCWSTR fileName)
 {
 	HRESULT hr;
-	IXAudio2SourceVoice* pSourceVoice;
+	IXAudio2SourceVoice* tmp;
 
 	// Open the file
 	HANDLE hFile = CreateFile
@@ -137,11 +137,11 @@ IXAudio2SourceVoice* XAudio2::LoadAudioData(LPCWSTR fileName)
 	_buffer.pAudioData = pDataBuffer;  //buffer containing audio data
 	_buffer.Flags = XAUDIO2_END_OF_STREAM; // tell the source voice not to expect any data after this buffer
 
-	if (FAILED(hr = _pXAudio2->CreateSourceVoice(&pSourceVoice, (WAVEFORMATEX*)&_wfx))) return NULL;
+	if (FAILED(hr = _pXAudio2->CreateSourceVoice(&tmp, (WAVEFORMATEX*)&_wfx))) return NULL;
 
-	if (FAILED(hr = pSourceVoice->SubmitSourceBuffer(&_buffer))) return NULL;
+	if (FAILED(hr = tmp->SubmitSourceBuffer(&_buffer))) return NULL;
 
-	return pSourceVoice;
+	return tmp;
 }
 
 bool XAudio2::StartAudio(IXAudio2SourceVoice* pSourceVoice)

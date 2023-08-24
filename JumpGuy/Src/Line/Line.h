@@ -1,4 +1,6 @@
 #pragma once
+#include <d3d9.h>
+#include <d3dx9.h>
 
 enum LineTypes
 {
@@ -43,13 +45,8 @@ public:
 			}
 		}
 	}
-	~Line()
-	{
-
-	}
 
 public:
-	void ResetCollisionData();
 	// Getters
 	int GetLineType();
 	D3DXVECTOR2 GetP1() { return _p1; }

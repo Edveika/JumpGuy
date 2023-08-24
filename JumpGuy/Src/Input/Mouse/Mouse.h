@@ -1,4 +1,10 @@
 #pragma once
+#pragma comment (lib,"dxguid.lib") 
+#pragma comment (lib,"dinput8.lib")
+#include <Windows.h>
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <dinput.h>
 
 class Mouse
 {

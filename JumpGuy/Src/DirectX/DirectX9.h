@@ -1,4 +1,7 @@
 #pragma once
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <vector>
 
 #define WINDOW_WIDTH 1200
 #define WINDOW_HEIGHT 900
@@ -33,8 +36,6 @@ public:
 	{
 		_pd3dDevice->Release();
 		_pD3D->Release();
-		for (size_t i = 0; i < _supportedScreenSettings.size(); ++i)
-			delete _supportedScreenSettings[i];
 	}
 
 public:

@@ -1,4 +1,4 @@
-#include "../Includes.h"
+#include "Graphics.h"
 
 void Graphics::ClearScreen(int r, int g, int b)
 {
