@@ -1,5 +1,16 @@
 #pragma once
 #pragma once
+#include <memory>
+#include <vector>
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <string>
+#include <fstream>
+
+#include "../CollisionDetection/CollisionDetection.h"
+#include "../Engine/Engine.h"
+#include "../Line/Line.h"
+#include "../Player/Player.h"
 
 class Level
 {

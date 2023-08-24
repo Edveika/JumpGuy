@@ -1,4 +1,15 @@
 #pragma once
+#include <memory>
+#include <Windows.h>
+#include <vector>
+#include <string>
+#include <filesystem>
+#include <fstream>
+
+#include "../Player/Player.h"
+#include "../Engine/Engine.h"
+#include "../Level/Level.h"
+#include "../Line/Line.h"
 
 class Map
 {

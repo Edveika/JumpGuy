@@ -1,4 +1,9 @@
 #pragma once
+#include <memory>
+
+#include "../Engine/Engine.h"
+#include "../Player/Player.h"
+#include "../Map/Map.h"
 
 class Game
 {

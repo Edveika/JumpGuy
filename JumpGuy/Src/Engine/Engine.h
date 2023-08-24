@@ -1,4 +1,12 @@
 #pragma once
+#include <Windows.h>
+#include <memory>
+
+#include "../DirectX/DirectX9.h"
+#include "../Graphics/Graphics.h"
+#include "../XAudio2/XAudio2.h"
+#include "../Input/Keyboard/Keyboard.h"
+#include "../Input/Mouse/Mouse.h"
 
 class Engine
 {

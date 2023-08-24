@@ -1,4 +1,10 @@
 #pragma once
+#include <memory>
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <Windows.h>
+
+#include "../Graphics/Graphics.h"
 
 enum AnimationType
 {

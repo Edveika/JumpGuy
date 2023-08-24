@@ -1,4 +1,4 @@
-#include "../Includes.h"
+#include "Sprite.h"
 
 void Sprite::Render(D3DXVECTOR2 spritePos, float dt)
 {

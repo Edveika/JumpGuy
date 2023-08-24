@@ -1,4 +1,4 @@
-#include "../../Includes.h"
+#include "Mouse.h"
 
 void Mouse::GetInput()
 {

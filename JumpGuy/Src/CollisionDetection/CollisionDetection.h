@@ -1,4 +1,9 @@
 #pragma once
+#include <memory>
+#include <vector>
+
+#include "../Line/Line.h"
+#include "../Player/Player.h"
 
 class CollisionDetection
 {

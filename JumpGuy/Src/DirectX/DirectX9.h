@@ -1,4 +1,7 @@
 #pragma once
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <vector>
 
 #define WINDOW_WIDTH 1200
 #define WINDOW_HEIGHT 900

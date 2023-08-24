@@ -1,4 +1,4 @@
-#include "../Includes.h"
+#include "XAudio2.h"
 
 bool XAudio2::CreateXAudio2Device()
 {

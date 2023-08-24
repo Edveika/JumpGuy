@@ -1,4 +1,10 @@
 #pragma once
+#include <memory>
+#include <Windows.h>
+#include <XAudio2.h>
+
+#include "../Engine/Engine.h"
+#include "../Sprite/Sprite.h"
 
 #define SPRITE_ARRAY_SIZE 12
 
