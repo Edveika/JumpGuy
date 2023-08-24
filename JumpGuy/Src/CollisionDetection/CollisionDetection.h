@@ -13,12 +13,12 @@ public:
 	}
 
 public:
-	void Update(Player* player, std::vector<Line> lines, float dt);
-	void PosCheck(Player* player, std::vector<Line> lines, float dt);
+	void Update(std::shared_ptr<Player> player, std::vector<Line> lines, float dt);
+	void PosCheck(std::shared_ptr<Player> player, std::vector<Line> lines, float dt);
 
 private:
-	Line GetPriorityCollision(Player* player, std::vector<Line> lines);
-	void ApplyCollisionLogic(Player* player, Line col, float dt);
-	void GroundCheck(Player* player, std::vector<Line> lines);
-	void GetLineCollisionData(Player* player, Line& line);
+	Line GetPriorityCollision(std::shared_ptr<Player> player, std::vector<Line> lines);
+	void ApplyCollisionLogic(std::shared_ptr<Player> player, Line col, float dt);
+	void GroundCheck(std::shared_ptr<Player> player, std::vector<Line> lines);
+	void GetLineCollisionData(std::shared_ptr<Player> player, Line& line);
 };

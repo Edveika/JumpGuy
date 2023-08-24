@@ -15,10 +15,6 @@ public:
 		_timePassed = 0.0f;
 		QueryPerformanceFrequency(&_timeFrequency);
 	}
-	~Timer()
-	{
-
-	}
 
 public:
 	void Start();

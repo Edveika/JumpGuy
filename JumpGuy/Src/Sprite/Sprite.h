@@ -13,7 +13,7 @@ private:
 	LPDIRECT3DTEXTURE9 _spriteSheetTexture = NULL;
 	LPD3DXSPRITE _sprite = NULL;
 	D3DXIMAGE_INFO _spriteSheetInfo;
-	Graphics* _gfx;
+	std::shared_ptr<Graphics> _gfx;
 	float _timePassed;
 	RECT _curSpriteImageRECT;
 	RECT _spriteImageRECT;
@@ -26,7 +26,7 @@ private:
 	float _animationTimer;
 
 public:
-	Sprite(Graphics* gfx, LPCWSTR fileName, int frameWidth, int frameHeight, float animationUpdate)
+	Sprite(std::shared_ptr<Graphics> gfx, LPCWSTR fileName, int frameWidth, int frameHeight, float animationUpdate)
 	{
 		_update = animationUpdate;
 		_gfx = gfx;
@@ -55,7 +55,6 @@ public:
 	{
 		_spriteSheetTexture->Release();
 		_sprite->Release();
-		delete _gfx;
 	}
 
 public:

@@ -3,22 +3,16 @@
 class Game
 {
 private:
-	Engine* _engine;
-	Player* _localPlayer;
-	Map* _map;
+	std::shared_ptr<Engine> _engine;
+	std::shared_ptr<Player> _localPlayer;
+	std::shared_ptr<Map> _map;
 
 public:
-	Game(Engine* engine)
+	Game(std::shared_ptr<Engine> engine)
 	{
-		_map = new Map(engine);
-		_engine = engine;
-		_localPlayer = new Player(engine, IDLE_RIGHT);
-	}
-	~Game()
-	{
-		delete _engine;
-		delete _localPlayer;
-		delete _map;
+		_map = std::make_shared<Map>(engine);
+		_engine = std::make_shared<Engine>();
+		_localPlayer = std::make_shared<Player>(engine, IDLE_RIGHT);
 	}
 
 public:

@@ -43,10 +43,6 @@ public:
 			}
 		}
 	}
-	~Line()
-	{
-
-	}
 
 public:
 	void ResetCollisionData();

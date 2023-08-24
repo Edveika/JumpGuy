@@ -33,8 +33,6 @@ public:
 	{
 		_pd3dDevice->Release();
 		_pD3D->Release();
-		for (size_t i = 0; i < _supportedScreenSettings.size(); ++i)
-			delete _supportedScreenSettings[i];
 	}
 
 public:

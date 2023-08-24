@@ -247,17 +247,17 @@ bool Player::InitGraphics()
 {
 	float s_AnimationUpdateSpeed = 0.1f;
 
-	if ((_sprites[MOVE_LEFT] = new Sprite(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\runLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[MOVE_RIGHT] = new Sprite(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\run.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[JUMP_LEFT] = new Sprite(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\jumpLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[JUMP_RIGHT] = new Sprite(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\jump.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[IDLE_LEFT] = new Sprite(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\idleLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[IDLE_RIGHT] = new Sprite(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\idle.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[FALL_LEFT] = new Sprite(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\fallLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[FALL_RIGHT] = new Sprite(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\fall.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[BUMP_LEFT] = new Sprite(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\oofLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[BUMP_RIGHT] = new Sprite(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\oof.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[CHARGING_JUMP] = new Sprite(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\squat.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((_sprites[MOVE_LEFT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\runLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((_sprites[MOVE_RIGHT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\run.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((_sprites[JUMP_LEFT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\jumpLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((_sprites[JUMP_RIGHT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\jump.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((_sprites[IDLE_LEFT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\idleLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((_sprites[IDLE_RIGHT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\idle.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((_sprites[FALL_LEFT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\fallLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((_sprites[FALL_RIGHT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\fall.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((_sprites[BUMP_LEFT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\oofLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((_sprites[BUMP_RIGHT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\oof.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((_sprites[CHARGING_JUMP] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\squat.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
 
 	return true;
 }

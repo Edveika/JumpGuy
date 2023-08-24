@@ -21,9 +21,9 @@ enum PlayerState
 class Player
 {
 private:
-	Sprite* _sprites[SPRITE_ARRAY_SIZE];
-	Sprite* _curSprite;
-	Engine* _engine;
+	std::shared_ptr<Sprite> _sprites[SPRITE_ARRAY_SIZE];
+	std::shared_ptr<Sprite> _curSprite;
+	std::shared_ptr<Engine> _engine;
 	IXAudio2SourceVoice* _audio;
 	int _curState;
 	int _oldState;
@@ -45,7 +45,7 @@ private:
 	bool _bEnableFlyMode;
 
 public:
-	Player(Engine* engine, int startingState)
+	Player(std::shared_ptr<Engine> engine, int startingState)
 	{
 		_curPos = { 535.f,737.f };
 		_curVel = { 0.0f, 0.0f };
@@ -69,21 +69,13 @@ public:
 		_maxPosRight = 0;
 		_bEnableFlyMode = false;
 	}
-	~Player()
-	{
-		delete _audio;
-		delete _engine;
-		delete _curSprite;
-		for (size_t i = 0; i < SPRITE_ARRAY_SIZE; ++i)
-			delete _sprites[i];
-	}
 
 public:
 	void Update(float dt);
 	void Render(float dt);
 
 	// Getters
-	Sprite* GetCurSprite() { return _curSprite; }
+	std::shared_ptr<Sprite> GetCurSprite() { return _curSprite; }
 	D3DXVECTOR2 GetCurPosition() { return _curPos; }
 	D3DXVECTOR2 GetCurVelocity() { return _curVel; }
 	bool GetIsOnGround() { if (_bIsOnGround)return true; return false; }

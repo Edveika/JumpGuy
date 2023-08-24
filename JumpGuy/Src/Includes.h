@@ -16,6 +16,7 @@
 #include <XAudio2.h>
 #include <dinput.h>
 #include <stdexcept>
+#include <memory>
 
 #include "DirectX/DirectX9.h"
 #include "Graphics/Graphics.h"
