@@ -2,6 +2,7 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <vector>
+#include <stdexcept>
 
 #define WINDOW_WIDTH 1200
 #define WINDOW_HEIGHT 900
@@ -15,37 +16,23 @@ struct SupportedScreenSettings
 class DirectX9
 {
 private:
-	LPDIRECT3DDEVICE9 _pd3dDevice;
-	LPDIRECT3D9 _pD3D;
-	HINSTANCE _hInst;
-	HWND _wndHandle;
-	std::vector<SupportedScreenSettings*> _supportedScreenSettings;
-
-public:
-	DirectX9(HINSTANCE hInstance)
-	{
-		// Initialize the window
-		if (!InitWindow(hInstance))
-			MessageBoxA(NULL, "Failed to create a window!", NULL, NULL);
-
-		// Initialize direct3d
-		if (!InitDirect3D())
-			MessageBoxA(NULL, "Failed to init Direct3D!", NULL, NULL);
-	}
-	~DirectX9()
-	{
-		_pd3dDevice->Release();
-		_pD3D->Release();
-	}
-
-public:
-	// Getters
-	int GetWindowWidth() { return WINDOW_WIDTH; }
-	int GetWindowHeight() { return WINDOW_HEIGHT; }
-	LPDIRECT3DDEVICE9 GetDevice() { return _pd3dDevice; }
+	LPDIRECT3DDEVICE9 m_d3d_device;
+	LPDIRECT3D9 m_d3d;
+	HINSTANCE m_instance;
+	HWND m_wnd_handle;
+	std::vector<SupportedScreenSettings*> m_supported_screen_settings;
 
 private:
-	bool InitWindow(HINSTANCE hInstance);
-	bool InitDirect3D();
-	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	bool init_window(HINSTANCE hInstance);
+	bool init_direct_3d();
+	static LRESULT CALLBACK wnd_proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+public:
+	DirectX9(HINSTANCE hInstance);
+	~DirectX9();
+
+	// Getters
+	int get_window_width() { return WINDOW_WIDTH; }
+	int get_window_height() { return WINDOW_HEIGHT; }
+	LPDIRECT3DDEVICE9 get_device() { return m_d3d_device; }
 };

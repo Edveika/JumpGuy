@@ -14,28 +14,19 @@
 
 class Level
 {
-public:
-	std::vector<Line> _lines;
-
 private:
-	std::shared_ptr<Engine> _engine;
-	std::shared_ptr<CollisionDetection> _collisionDetection;
-	LPDIRECT3DSURFACE9 _levelImage;
-	LPDIRECT3DSURFACE9 _backbuffer;
-	std::fstream _lineData;
-	std::fstream _debugData;
+	std::vector<Line> m_lines;
+	std::shared_ptr<Engine> m_engine;
+	LPDIRECT3DSURFACE9 m_level_image;
+	LPDIRECT3DSURFACE9 m_backbuffer;
 
 public:
 	Level() {}
-	Level(std::shared_ptr<Engine> eng, std::string mapFileName)
-	{
-		_engine = eng;
-		_levelImage = _engine->GetGraphicsPtr()->GetSurfaceFromBitmap(mapFileName);
-		_collisionDetection = std::make_shared<CollisionDetection>();
-	}
+	Level(std::shared_ptr<Engine> eng, std::string mapFileName);
 
-public:
-	void Update(std::shared_ptr<Player> player, float dt);
-	void Render(std::shared_ptr<Player> player, float dt);
-	void AddLine(Line line) { _lines.push_back(line); }
+	void render(float dt);
+	void add_line(Line line) { m_lines.push_back(line); }
+
+	// Getters
+	std::vector<Line> get_lines() { return m_lines; }
 };

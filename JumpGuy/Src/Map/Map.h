@@ -14,28 +14,21 @@
 class Map
 {
 private:
-	std::shared_ptr<Engine> _engine;
-	std::shared_ptr<Level> _curLevel;
-	std::vector<std::shared_ptr<Level>> _levels;
-	int _curLvlIndex;
+	std::shared_ptr<Engine> m_engine;
+	std::shared_ptr<Level> m_curLevel;
+	std::vector<std::shared_ptr<Level>> m_levels;
+	int m_cur_lvl_index;
+
+private:
+	bool init_levels();
 
 public:
-	Map(std::shared_ptr<Engine> engine)
-	{
-		if (!std::filesystem::exists("Assets"))
-			MessageBoxA(NULL, "No Assets dir found!", NULL, NULL);
-		_curLvlIndex = 0;
-		_engine = engine;
-		InitLevels();
-		_curLevel = _levels[_curLvlIndex];
-	}
+	Map(std::shared_ptr<Engine> engine);
 
-public:
-	void Update(std::shared_ptr<Player> player, float dt);
-	void Render(std::shared_ptr<Player> player, float dt);
+	void update(std::shared_ptr<Player> player);
+	void render(float dt);
 
-	bool InitLevels();
-
-	std::shared_ptr<Level> GetCurLevel(std::shared_ptr<Player> player);
-	std::shared_ptr<Level> GetCurLevel() { return _curLevel; }
+	// Getters
+	std::shared_ptr<Level> get_cur_level(std::shared_ptr<Player> player);
+	std::shared_ptr<Level> get_cur_level() { return m_curLevel; }
 };

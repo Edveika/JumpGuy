@@ -4,23 +4,26 @@
 #include "../Engine/Engine.h"
 #include "../Player/Player.h"
 #include "../Map/Map.h"
+#include "../Timer/Timer.h"
+#include "../Graphics/Graphics.h"
 
 class Game
 {
 private:
-	std::shared_ptr<Engine> _engine;
-	std::shared_ptr<Player> _localPlayer;
-	std::shared_ptr<Map> _map;
+	std::shared_ptr<Engine> m_engine;
+	std::shared_ptr<Player> m_localPlayer;
+	std::shared_ptr<Map> m_map;
+	std::shared_ptr<Timer> m_timer;
+	std::shared_ptr<Graphics> m_graphics;
+	std::shared_ptr<CollisionDetection> _collisionDetection;
+
+private:
+	void display_loading_screen();
+	void update(float dt);
+	void render(float dt);
 
 public:
-	Game(std::shared_ptr<Engine> engine)
-	{
-		_map = std::make_shared<Map>(engine);
-		_engine = std::make_shared<Engine>();
-		_localPlayer = std::make_shared<Player>(engine, IDLE_RIGHT);
-	}
+	Game(HINSTANCE hInstance);
 
-public:
-	void Update(float dt);
-	void Render(float dt);
+	void run();
 };

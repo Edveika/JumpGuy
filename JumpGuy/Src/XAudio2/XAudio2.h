@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <XAudio2.h>
+#include <stdexcept>
 
 #define fourccRIFF 'FFIR'
 #define fourccDATA 'atad'
@@ -12,36 +13,24 @@
 class XAudio2
 {
 private:
-	IXAudio2* _pXAudio2 = nullptr;
-	IXAudio2MasteringVoice* _pMasterVoice = nullptr;
-	WAVEFORMATEXTENSIBLE _wfx = { 0 };
-	XAUDIO2_BUFFER _buffer = { 0 };
-	DWORD _dwChunkSize;
-	DWORD _dwChunkPosition;
-
-public:
-	XAudio2()
-	{
-		if (!CreateXAudio2Device())
-			MessageBoxA(NULL, "Failed to create XAudio2 device!", NULL, NULL);
-
-		if (!CreateIXAudio2MasteringVoiceObj())
-			MessageBoxA(NULL, "Failed to create a voice!", NULL, NULL);
-	}
-	~XAudio2()
-	{
-		delete _pXAudio2;
-		delete _pMasterVoice;
-	}
-
-public:
-	IXAudio2SourceVoice* LoadAudioData(LPCWSTR fileName);
-	bool StartAudio(IXAudio2SourceVoice* pSourceVoice);
-	bool StopAudio(IXAudio2SourceVoice* pSourceVoice);
+	IXAudio2* m_xaudio2 = nullptr;
+	IXAudio2MasteringVoice* m_master_voice = nullptr;
+	WAVEFORMATEXTENSIBLE m_wfx = { 0 };
+	XAUDIO2_BUFFER m_buffer = { 0 };
+	DWORD m_chunk_size;
+	DWORD m_chunk_position;
 
 private:
-	bool CreateXAudio2Device();
-	bool CreateIXAudio2MasteringVoiceObj();
-	HRESULT FindChunk(HANDLE hFile, DWORD fourcc, DWORD& dwChunkSize, DWORD& dwChunkDataPosition);
-	HRESULT ReadChunkData(HANDLE hFile, void* buffer, DWORD buffersize, DWORD bufferoffset);
+	bool create_xaudio2_device();
+	bool create_xaudio2_mastering_voice_obj();
+	HRESULT find_chunk(HANDLE hFile, DWORD fourcc, DWORD& dwChunkSize, DWORD& dwChunkDataPosition);
+	HRESULT read_chunk_data(HANDLE hFile, void* buffer, DWORD buffersize, DWORD bufferoffset);
+
+public:
+	XAudio2();
+	~XAudio2();
+
+	IXAudio2SourceVoice* load_audio_data(LPCWSTR fileName);
+	bool play_audio(IXAudio2SourceVoice* pSourceVoice);
+	bool stop_audio(IXAudio2SourceVoice* pSourceVoice);
 };

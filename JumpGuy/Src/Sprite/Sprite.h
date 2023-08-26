@@ -3,70 +3,39 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <Windows.h>
+#include <stdexcept>
 
 #include "../Graphics/Graphics.h"
-
-enum AnimationType
-{
-	ANIM_NONE,
-	ANIM_FORWARD,
-	ANIM_BACKWARD,
-};
 
 class Sprite
 {
 private:
-	LPDIRECT3DTEXTURE9 _spriteSheetTexture = NULL;
-	LPD3DXSPRITE _sprite = NULL;
-	D3DXIMAGE_INFO _spriteSheetInfo;
-	std::shared_ptr<Graphics> _gfx;
-	float _timePassed;
-	RECT _curSpriteImageRECT;
-	RECT _spriteImageRECT;
-	int _spriteWidth;
-	int _spriteHeight;
-	int _numSpriteFrames;
-	int _curSpriteFrame;
-	float _update;
-	float _lastUpdate;
-	float _animationTimer;
+	struct SpriteAnimation
+	{
+		float m_time_passed;
+		int m_num_sprite_frames;
+		int m_cur_sprite_frame;
+		float m_update;
+		float m_last_update;
+		float m_animation_timer;
+	};
+
+	std::shared_ptr<Graphics> m_gfx;
+	LPD3DXSPRITE m_cur_sprite = NULL;
+	RECT m_cur_sprite_rect;
+	LPDIRECT3DTEXTURE9 m_sprite_sheet = NULL;
+	D3DXIMAGE_INFO m_sprite_sheet_info;
+	SpriteAnimation m_animation;
+	int m_sprite_width;
+	int m_sprite_height;
 
 public:
-	Sprite(std::shared_ptr<Graphics> gfx, LPCWSTR fileName, int frameWidth, int frameHeight, float animationUpdate)
-	{
-		_update = animationUpdate;
-		_gfx = gfx;
-		_spriteWidth = frameWidth;
-		_spriteHeight = frameHeight;
-		_curSpriteFrame = 0;
-		_curSpriteImageRECT.top = 0;
-		_curSpriteImageRECT.left = 0;
-		_curSpriteImageRECT.right = _curSpriteImageRECT.left + frameWidth;
-		_curSpriteImageRECT.bottom = frameHeight;
-		_timePassed = 0.0f;
-		_lastUpdate = 0;
-		_animationTimer = 0;
+	Sprite(std::shared_ptr<Graphics> gfx, LPCWSTR fileName, int frameWidth, int frameHeight, float animationUpdate);
+	~Sprite();
 
-		gfx->GetImageInfo(fileName, _spriteSheetInfo);
-
-		if (FAILED(D3DXCreateTextureFromFileEx(_gfx->_pd3dDevice, fileName, _spriteSheetInfo.Width, _spriteSheetInfo.Height, D3DX_DEFAULT, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, NULL, NULL, &_spriteSheetTexture)))
-			MessageBoxA(NULL, "Failed to create texture from file!", NULL, NULL);
-
-		_numSpriteFrames = (_spriteSheetInfo.Width / frameWidth) - 1;
-
-		if (FAILED(D3DXCreateSprite(_gfx->_pd3dDevice, &_sprite)))
-			MessageBoxA(NULL, "Failed to create a sprite!", NULL, NULL);
-	}
-	~Sprite()
-	{
-		_spriteSheetTexture->Release();
-		_sprite->Release();
-	}
-
-public:
-	void Render(D3DXVECTOR2 spritePos, float dt);
+	void render(D3DXVECTOR2 spritePos, float dt);
 
 	// Getters
-	int GetWidth() { return _spriteWidth; }
-	int GetHeight() { return _spriteHeight; }
+	int get_width() { return m_sprite_width; }
+	int get_height() { return m_sprite_height; }
 };

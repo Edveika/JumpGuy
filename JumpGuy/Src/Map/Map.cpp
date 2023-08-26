@@ -1,23 +1,41 @@
 #include "Map.h"
 
+Map::Map(std::shared_ptr<Engine> engine)
+{
+	if (!std::filesystem::exists("Assets"))
+	{
+		MessageBoxA(NULL, "[MAP]: No Assets dir found!", NULL, NULL);
+		throw std::invalid_argument("[MAP]: Assets dir does not exist");
+	}
+	m_cur_lvl_index = 0;
+	m_engine = engine;
+	if (!m_engine)
+	{
+		MessageBoxA(NULL, "[MAP]: Engine obj was not created", NULL, NULL);
+		throw std::invalid_argument("[MAP]: Engine was not created");
+	}
+	init_levels();
+	m_curLevel = m_levels[m_cur_lvl_index];
+}
+
 Line GetLineFromStr(std::string str)
 {
 	std::string p1;
 	std::string p2;
 
-	int curLinePoint = 0;
+	int cur_line_point = 0;
 	for (size_t i = 0; i < str.size(); ++i)
 	{
 		if (str[i] == ' ')
 		{
-			++curLinePoint;
+			++cur_line_point;
 		}
 
-		if (curLinePoint == 0 && str[i] != ' ')
+		if (cur_line_point == 0 && str[i] != ' ')
 		{
 			p1 += str[i];
 		}
-		else if (curLinePoint == 1 && str[i] != ' ')
+		else if (cur_line_point == 1 && str[i] != ' ')
 		{
 			p2 += str[i];
 		}
@@ -25,18 +43,18 @@ Line GetLineFromStr(std::string str)
 
 	std::string x1;
 	std::string y1;
-	int curP1Coord = 0;
+	int cur_p1_coord = 0;
 	for (size_t i = 0; i < p1.size(); ++i)
 	{
 		if (p1[i] == ';')
 		{
-			++curP1Coord;
+			++cur_p1_coord;
 		}
-		else if (curP1Coord == 0)
+		else if (cur_p1_coord == 0)
 		{
 			x1 += p1[i];
 		}
-		else if (curP1Coord == 1)
+		else if (cur_p1_coord == 1)
 		{
 			y1 += p1[i];
 		}
@@ -44,18 +62,18 @@ Line GetLineFromStr(std::string str)
 
 	std::string x2;
 	std::string y2;
-	int curP2Coord = 0;
+	int cur_p2_coord = 0;
 	for (size_t i = 0; i < p2.size(); ++i)
 	{
 		if (p2[i] == ';')
 		{
-			++curP2Coord;
+			++cur_p2_coord;
 		}
-		else if (curP2Coord == 0)
+		else if (cur_p2_coord == 0)
 		{
 			x2 += p2[i];
 		}
-		else if (curP2Coord == 1)
+		else if (cur_p2_coord == 1)
 		{
 			y2 += p2[i];
 		}
@@ -71,9 +89,9 @@ Line GetLineFromStr(std::string str)
 	return line;
 }
 
-bool Map::InitLevels()
+bool Map::init_levels()
 {
-	int curLevel = 0;
+	int cur_level = 0;
 	std::ifstream fw;
 	std::string tmp;
 	fw.open("Assets\\CollisionData.dat");
@@ -82,29 +100,29 @@ bool Map::InitLevels()
 	{
 		if (tmp.substr(tmp.find_last_of(".") + 1) == "png")
 		{
-			std::shared_ptr<Level> level = std::make_shared<Level>(_engine, "Assets\\Levels\\" + tmp);
-			_levels.push_back(level);
+			std::shared_ptr<Level> level = std::make_shared<Level>(m_engine, "Assets\\Levels\\" + tmp);
+			m_levels.push_back(level);
 		}
 		else
 		{
 			if (!tmp.empty())
 			{
 				Line line = GetLineFromStr(tmp);
-				_levels[curLevel]->AddLine(line);
+				m_levels[cur_level]->add_line(line);
 			}
 		}
 		if (tmp == "")
 		{
-			++curLevel;
+			++cur_level;
 		}
 	}
 
 	return true;
 }
 
-std::shared_ptr<Level> Map::GetCurLevel(std::shared_ptr<Player> player)
+std::shared_ptr<Level> Map::get_cur_level(std::shared_ptr<Player> player)
 {
-	std::shared_ptr<Level> lvl = _levels[_curLvlIndex];
+	std::shared_ptr<Level> lvl = m_levels[m_cur_lvl_index];
 
 #ifdef _DEBUG
 	if (GetAsyncKeyState('P') & 1 && _curLvlIndex + 1 < _levels.size())
@@ -113,35 +131,34 @@ std::shared_ptr<Level> Map::GetCurLevel(std::shared_ptr<Player> player)
 	}
 #endif
 
-	if (player->GetCurPosition().y + player->GetHitboxTop() < 0 && player->GetIsGoingUp())
+	if (player->get_cur_position().y + player->get_hitbox_top() < 0 && player->get_going_up())
 	{
-		if (_curLvlIndex + 1 < _levels.size() - 1)
+		if (m_cur_lvl_index + 1 < m_levels.size() - 1)
 		{
-			++_curLvlIndex;
-			lvl = _levels[_curLvlIndex];
-			player->SetPositionY(WINDOW_HEIGHT);
+			++m_cur_lvl_index;
+			lvl = m_levels[m_cur_lvl_index];
+			player->set_position_y(WINDOW_HEIGHT);
 		}
 	}
-	else if (player->GetCurPosition().y + player->GetHitboxBottom() > WINDOW_HEIGHT && player->GetIsGoingDown())
+	else if (player->get_cur_position().y + player->get_hitbox_bottom() > WINDOW_HEIGHT && player->get_going_down())
 	{
-		if (_curLvlIndex - 1 >= 0)
+		if (m_cur_lvl_index - 1 >= 0)
 		{
-			--_curLvlIndex;
-			lvl = _levels[_curLvlIndex];
-			player->SetPositionY(0);
+			--m_cur_lvl_index;
+			lvl = m_levels[m_cur_lvl_index];
+			player->set_position_y(0);
 		}
 	}
 
 	return lvl;
 }
 
-void Map::Update(std::shared_ptr<Player> player, float dt)
+void Map::update(std::shared_ptr<Player> player)
 {
-	_curLevel = GetCurLevel(player);
-	_curLevel->Update(player, dt);
+	m_curLevel = get_cur_level(player);
 }
 
-void Map::Render(std::shared_ptr<Player> player, float dt)
+void Map::render(float dt)
 {
-	_curLevel->Render(player, dt);
+	m_curLevel->render(dt);
 }

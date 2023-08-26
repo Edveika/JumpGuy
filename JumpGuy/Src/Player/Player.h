@@ -8,139 +8,110 @@
 
 #define SPRITE_ARRAY_SIZE 12
 
-enum PlayerState
-{
-	IDLE_RIGHT,
-	IDLE_LEFT,
-	MOVE_RIGHT,
-	MOVE_LEFT,
-	JUMP_UP,
-	JUMP_RIGHT,
-	JUMP_LEFT,
-	FALL_LEFT,
-	FALL_RIGHT,
-	BUMP_LEFT,
-	BUMP_RIGHT,
-	CHARGING_JUMP,
-};
-
 class Player
 {
 private:
-	std::shared_ptr<Sprite> _sprites[SPRITE_ARRAY_SIZE];
-	std::shared_ptr<Sprite> _curSprite;
-	std::shared_ptr<Engine> _engine;
-	IXAudio2SourceVoice* _audio;
-	int _curState;
-	int _oldState;
-	D3DXVECTOR2 _curPos;
-	D3DXVECTOR2 _curVel;
-	D3DXVECTOR2 _curGravity;
-	RECT _hitbox;
-	bool _bBumpedLeft;
-	bool _bBumpedRight;
-	bool _bIsChargingJump;
-	float _minJumpForce;
-	float _maxJumpForce;
-	float _curJumpForce;
-	float _maxPosUp;
-	float _maxPosDown;
-	float _maxPosLeft;
-	float _maxPosRight;
-	bool _bIsOnGround;
-	bool _bEnableFlyMode;
-
-public:
-	Player(std::shared_ptr<Engine> engine, int startingState)
+	enum PlayerState
 	{
-		_curPos = { 535.f,737.f };
-		_curVel = { 0.0f, 0.0f };
-		_curGravity = { 0.0f, 1500.f };
-		_curState = startingState;
-		_engine = engine;
-		InitGraphics();
-		_curSprite = _sprites[_curState];
-		_hitbox.left = 20;
-		_hitbox.right = _curSprite->GetWidth() - 20;
-		_hitbox.top = 30;
-		_hitbox.bottom = _curSprite->GetHeight() - 10;
-		_minJumpForce = -0.5f;
-		_maxJumpForce = -6.5f;
-		_bIsOnGround = false;
-		_oldState = MOVE_RIGHT;
-		_curState = FALL_RIGHT;
-		_maxPosUp = 0;
-		_maxPosDown = 0;
-		_maxPosLeft = 0;
-		_maxPosRight = 0;
-		_bEnableFlyMode = false;
-	}
+		IDLE_RIGHT,
+		IDLE_LEFT,
+		MOVE_RIGHT,
+		MOVE_LEFT,
+		JUMP_UP,
+		JUMP_RIGHT,
+		JUMP_LEFT,
+		FALL_LEFT,
+		FALL_RIGHT,
+		BUMP_LEFT,
+		BUMP_RIGHT,
+		CHARGING_JUMP,
+	};
 
-public:
-	void Update(float dt);
-	void Render(float dt);
-
-	// Getters
-	std::shared_ptr<Sprite> GetCurSprite() { return _curSprite; }
-	D3DXVECTOR2 GetCurPosition() { return _curPos; }
-	D3DXVECTOR2 GetCurVelocity() { return _curVel; }
-	bool GetIsOnGround() { if (_bIsOnGround)return true; return false; }
-	bool GetIsInAir() { if (!_bIsOnGround)return true; return false; }
-	bool GetIsGoingUp() { if (_curVel.y < 0)return true; return false; }
-	bool GetIsGoingDown() { if (_curVel.y > 0)return true; return false; }
-	bool GetIsGoingLeft() { if (_curVel.x < 0)return true; return false; }
-	bool GetIsGoingRight() { if (_curVel.x > 0)return true; return false; }
-	bool GetBumpedLeft() { if (_bBumpedLeft)return true; return false; }
-	bool GetBumpedRight() { if (_bBumpedRight)return true; return false; }
-	LONG GetHitboxLeft() { return _hitbox.left; }
-	LONG GetHitboxRight() { return _hitbox.right; }
-	LONG GetHitboxTop() { return _hitbox.top; }
-	LONG GetHitboxBottom() { return _hitbox.bottom; }
-	RECT GetHitbox() { return _hitbox; }
-	float GetMaxPosDown() { return _maxPosDown; }
-
-	// Setters
-	void SetPosition(D3DXVECTOR2 newPos) { _curPos = newPos; }
-	void SetPositionX(float newPosX) { _curPos.x = newPosX; }
-	void SetPositionY(float newPosY) { _curPos.y = newPosY; }
-	void SetVelocity(D3DXVECTOR2 newVel) { _curVel = newVel; }
-	void SetVelocityX(float newVelX) { _curVel.x = newVelX; }
-	void SetVelocityY(float newVelY) { _curVel.y = newVelY; }
-	void InvertVelocity() { _curVel.x *= -1.0f; _curVel.y *= -1.0f; }
-	void InvertVelocityX() { _curVel.x *= -1.0f; }
-	void InvertVelocityY() { _curVel.y *= -1.0f; }
-	void SetIsOnGround() { _bIsOnGround = true; }
-	void SetIsInAir() { _bIsOnGround = false; }
-	void SetBumpedLeft() { _bBumpedLeft = true; _bBumpedRight = false; }
-	void SetBumpedRight() { _bBumpedRight = true; _bBumpedLeft = false; }
-	void SetMaxPosLeft(float value) { _maxPosLeft = value; } // replace with RECT?
-	void SetMaxPosRight(float value) { _maxPosRight = value; }
-	void SetMaxPosUp(float value) { _maxPosUp = value; }
-	void SetMaxPosDown(float value) { _maxPosDown = value; }
+	std::shared_ptr<Sprite> m_sprites[SPRITE_ARRAY_SIZE];
+	std::shared_ptr<Sprite> m_cur_sprite;
+	std::shared_ptr<Engine> m_engine;
+	IXAudio2SourceVoice* m_audio;
+	int m_cur_state;
+	int m_old_state;
+	D3DXVECTOR2 m_cur_pos;
+	D3DXVECTOR2 m_cur_vel;
+	D3DXVECTOR2 m_cur_gravity;
+	RECT m_hitbox;
+	bool m_bumped_left;
+	bool m_bumped_right;
+	bool m_charging_jump;
+	float m_min_jump_force;
+	float m_max_jump_force;
+	float m_cur_jump_force;
+	float m_max_pos_up;
+	float m_max_pos_down;
+	float m_max_pos_left;
+	float m_max_pos_right;
+	bool m_on_ground;
+	bool m_enable_fly_mode;
 
 private:
-	bool InitGraphics();
-	void GetSpriteForCurrentState();
-	void Move();
-	void Jump(float dt);
-	void Movement(float dt);
-	void ApplyVelocity(float dt);
-	void Gravity(float dt);
-	void GetJumpForce(float dt);
-	void Fly();
+	bool init_graphics();
+	void get_sprite_for_current_state();
+	void move();
+	void jump(float dt);
+	void apply_velocity(float dt);
+	void gravity(float dt);
+	void get_jump_force(float dt);
+	void fly();
 
-	//
-	// Shouldnt be here stuff
-	//
-	bool PressedLeft() { if (_engine->GetKeyboardPtr()->IsPressed(DIK_A))return true; return false; }
-	bool PressedRight() { if (_engine->GetKeyboardPtr()->IsPressed(DIK_D))return true; return false; }
-	bool PressedJump() { if (_engine->GetKeyboardPtr()->IsPressed(DIK_SPACE))return true; return false; }
-	bool PressedUp() { if (_engine->GetKeyboardPtr()->IsPressed(DIK_W))return true; return false; }
-	bool PressedDown() { if (_engine->GetKeyboardPtr()->IsPressed(DIK_S))return true; return false; }
+	bool pressed_left() { if (m_engine->get_keyboard_ptr()->is_pressed(DIK_A))return true; return false; }
+	bool pressed_right() { if (m_engine->get_keyboard_ptr()->is_pressed(DIK_D))return true; return false; }
+	bool pressed_jump() { if (m_engine->get_keyboard_ptr()->is_pressed(DIK_SPACE))return true; return false; }
+	bool pressed_up() { if (m_engine->get_keyboard_ptr()->is_pressed(DIK_W))return true; return false; }
+	bool pressed_down() { if (m_engine->get_keyboard_ptr()->is_pressed(DIK_S))return true; return false; }
 
 public:
-	void PlayJumpSound() { _engine->GetAudioPtr()->StartAudio(_engine->GetAudioPtr()->LoadAudioData(L"Assets\\Sounds\\jump.wav")); }
-	void PlayLandSound() { _engine->GetAudioPtr()->StartAudio(_engine->GetAudioPtr()->LoadAudioData(L"Assets\\Sounds\\land.wav")); }
-	void PlayBumpSound() { _engine->GetAudioPtr()->StartAudio(_engine->GetAudioPtr()->LoadAudioData(L"Assets\\Sounds\\bump.wav")); }
-	void PlayFallSound() { _engine->GetAudioPtr()->StartAudio(_engine->GetAudioPtr()->LoadAudioData(L"Assets\\Sounds\\fall.wav")); }
+	Player(std::shared_ptr<Engine> engine);
+
+	void update(float dt);
+	void render(float dt);
+
+	// Getters
+	std::shared_ptr<Sprite> get_cur_sprite() { return m_cur_sprite; }
+	D3DXVECTOR2 get_cur_position() { return m_cur_pos; }
+	D3DXVECTOR2 get_cur_velocity() { return m_cur_vel; }
+	bool get_on_ground() { if (m_on_ground)return true; return false; }
+	bool get_in_air() { if (!m_on_ground)return true; return false; }
+	bool get_going_up() { if (m_cur_vel.y < 0)return true; return false; }
+	bool get_going_down() { if (m_cur_vel.y > 0)return true; return false; }
+	bool get_going_left() { if (m_cur_vel.x < 0)return true; return false; }
+	bool get_going_right() { if (m_cur_vel.x > 0)return true; return false; }
+	bool get_bumped_left() { if (m_bumped_left)return true; return false; }
+	bool get_bumped_right() { if (m_bumped_right)return true; return false; }
+	LONG get_hitbox_left() { return m_hitbox.left; }
+	LONG get_hitbox_right() { return m_hitbox.right; }
+	LONG get_hitbox_top() { return m_hitbox.top; }
+	LONG get_hitbox_bottom() { return m_hitbox.bottom; }
+	RECT get_hitbox() { return m_hitbox; }
+	float get_max_pos_down() { return m_max_pos_down; }
+
+	// Setters
+	void set_position(D3DXVECTOR2 newPos) { m_cur_pos = newPos; }
+	void set_position_x(float newPosX) { m_cur_pos.x = newPosX; }
+	void set_position_y(float newPosY) { m_cur_pos.y = newPosY; }
+	void set_velocity(D3DXVECTOR2 newVel) { m_cur_vel = newVel; }
+	void set_velocity_x(float newVelX) { m_cur_vel.x = newVelX; }
+	void set_velocity_y(float newVelY) { m_cur_vel.y = newVelY; }
+	void invert_velocity() { m_cur_vel.x *= -1.0f; m_cur_vel.y *= -1.0f; }
+	void invert_velocity_x() { m_cur_vel.x *= -1.0f; }
+	void invert_velocity_y() { m_cur_vel.y *= -1.0f; }
+	void set_on_ground() { m_on_ground = true; }
+	void set_in_air() { m_on_ground = false; }
+	void set_bumped_left() { m_bumped_left = true; m_bumped_right = false; }
+	void set_bumped_right() { m_bumped_right = true; m_bumped_left = false; }
+	void set_max_pos_left(float value) { m_max_pos_left = value; } // replace with RECT?
+	void set_max_pos_right(float value) { m_max_pos_right = value; }
+	void set_max_pos_up(float value) { m_max_pos_up = value; }
+	void set_max_pos_down(float value) { m_max_pos_down = value; }
+
+	void play_jump_sound() { m_engine->get_audio_ptr()->play_audio(m_engine->get_audio_ptr()->load_audio_data(L"Assets\\Sounds\\jump.wav")); }
+	void play_land_sound() { m_engine->get_audio_ptr()->play_audio(m_engine->get_audio_ptr()->load_audio_data(L"Assets\\Sounds\\land.wav")); }
+	void play_bump_sound() { m_engine->get_audio_ptr()->play_audio(m_engine->get_audio_ptr()->load_audio_data(L"Assets\\Sounds\\bump.wav")); }
+	void play_fall_sound() { m_engine->get_audio_ptr()->play_audio(m_engine->get_audio_ptr()->load_audio_data(L"Assets\\Sounds\\fall.wav")); }
 };
