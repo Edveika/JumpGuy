@@ -1,14 +1,22 @@
 #include "Timer.h"
 
-void Timer::Start()
+Timer::Timer()
 {
-	QueryPerformanceCounter(&_timeStart);
+	m_time_passed = 0.0f;
+	QueryPerformanceFrequency(&m_time_frequency);
 }
 
-void Timer::End()
+void Timer::start()
 {
-	QueryPerformanceCounter(&_timeEnd);
-	_timePassed = ((float)_timeEnd.QuadPart - (float)_timeStart.QuadPart) / _timeFrequency.QuadPart;
-	if (_timePassed > 0.15f) _timePassed = 0.15f;
-	_totalTimePassed += _timePassed;
+	QueryPerformanceCounter(&m_time_start);
+}
+
+void Timer::end()
+{
+	QueryPerformanceCounter(&m_time_end);
+
+	m_time_passed = ((float)m_time_end.QuadPart - (float)m_time_start.QuadPart) / m_time_frequency.QuadPart;
+	
+	if (m_time_passed > 0.15f) 
+		m_time_passed = 0.15f;
 }

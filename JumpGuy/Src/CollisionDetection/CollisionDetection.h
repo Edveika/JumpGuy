@@ -7,23 +7,13 @@
 
 class CollisionDetection
 {
-public:
-	CollisionDetection()
-	{
-
-	}
-	~CollisionDetection()
-	{
-
-	}
-
-public:
-	void Update(std::shared_ptr<Player> player, std::vector<Line> lines, float dt);
-	void PosCheck(std::shared_ptr<Player> player, std::vector<Line> lines, float dt);
-
 private:
-	Line GetPriorityCollision(std::shared_ptr<Player> player, std::vector<Line> lines);
-	void ApplyCollisionLogic(std::shared_ptr<Player> player, Line col, float dt);
-	void GroundCheck(std::shared_ptr<Player> player, std::vector<Line> lines);
-	void GetLineCollisionData(std::shared_ptr<Player> player, Line& line);
+	Line get_priority_collision(std::shared_ptr<Player> player, std::vector<Line> lines);
+	void apply_collision_logic(std::shared_ptr<Player> player, Line col, float dt);
+	void ground_check(std::shared_ptr<Player> player, std::vector<Line> lines);
+	void get_line_collision_data(std::shared_ptr<Player> player, Line& line);
+
+public:
+	void update(std::shared_ptr<Player> player, std::vector<Line> lines, float dt);
+	void pos_check(std::shared_ptr<Player> player, std::vector<Line> lines, float dt);
 };

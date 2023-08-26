@@ -5,27 +5,17 @@
 class Timer
 {
 private:
-	LARGE_INTEGER _timeStart;
-	LARGE_INTEGER _timeEnd;
-	LARGE_INTEGER _timeFrequency;
-	float _timePassed;
-	float _totalTimePassed;
+	LARGE_INTEGER m_time_start;
+	LARGE_INTEGER m_time_end;
+	LARGE_INTEGER m_time_frequency;
+	float m_time_passed;
 
 public:
-	Timer()
-	{
-		_timePassed = 0.0f;
-		QueryPerformanceFrequency(&_timeFrequency);
-	}
+	Timer();
 
-public:
-	void Start();
-	void End();
+	void start();
+	void end();
 
 	// Getters
-	LONGLONG GetTimeStart() { return _timeStart.QuadPart; }
-	LONGLONG GetTimeEnd() { return _timeEnd.QuadPart; }
-	LONGLONG GetTimeFreq() { return _timeFrequency.QuadPart; }
-	float GetTimePassed() { return _timePassed; }
-	float GetTotalTimePassed() { return _totalTimePassed; }
+	float get_time_passed() { return m_time_passed; }
 };

@@ -1,11 +1,11 @@
 #include "CollisionDetection.h"
 
-bool CheckForLineToLineCollision(Line line, float x3, float y3, float x4, float y4)
+bool line_to_line_collision(Line line, float x3, float y3, float x4, float y4)
 {
-	float x1 = line.GetP1().x;
-	float y1 = line.GetP1().y;
-	float x2 = line.GetP2().x;
-	float y2 = line.GetP2().y;
+	float x1 = line.get_p1().x;
+	float y1 = line.get_p1().y;
+	float x2 = line.get_p2().x;
+	float y2 = line.get_p2().y;
 
 	float uA = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
 	float uB = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
@@ -22,147 +22,147 @@ bool CheckForLineToLineCollision(Line line, float x3, float y3, float x4, float 
 	return false;
 }
 
-void GetLineRectData(Line& line, float rx, float ry, RECT hitbox)
+void get_line_rect_data(Line& line, float rx, float ry, RECT hitbox)
 {
-	bool bLeftSideCollided = CheckForLineToLineCollision(line, rx + hitbox.left, ry + hitbox.top, rx + hitbox.left, ry + hitbox.bottom);
-	bool bRightSideCollided = CheckForLineToLineCollision(line, rx + hitbox.right, ry + hitbox.top, rx + hitbox.right, ry + hitbox.bottom);
-	bool bTopCollided = CheckForLineToLineCollision(line, rx + hitbox.left, ry + hitbox.top, rx + hitbox.right, ry + hitbox.top);
-	bool bBottomCollided = CheckForLineToLineCollision(line, rx + hitbox.left, ry + hitbox.bottom, rx + hitbox.right, ry + hitbox.bottom);
+	bool bLeftSideCollided = line_to_line_collision(line, rx + hitbox.left, ry + hitbox.top, rx + hitbox.left, ry + hitbox.bottom);
+	bool bRightSideCollided = line_to_line_collision(line, rx + hitbox.right, ry + hitbox.top, rx + hitbox.right, ry + hitbox.bottom);
+	bool bTopCollided = line_to_line_collision(line, rx + hitbox.left, ry + hitbox.top, rx + hitbox.right, ry + hitbox.top);
+	bool bBottomCollided = line_to_line_collision(line, rx + hitbox.left, ry + hitbox.bottom, rx + hitbox.right, ry + hitbox.bottom);
 
-	if (bLeftSideCollided) line.SetCollidedLeft(true);
-	if (bRightSideCollided) line.SetCollidedRight(true);
-	if (bTopCollided) line.SetCollidedTop(true);
-	if (bBottomCollided) line.SetCollidedBottom(true);
+	if (bLeftSideCollided) line.set_collided_left(true);
+	if (bRightSideCollided) line.set_collided_right(true);
+	if (bTopCollided) line.set_collided_top(true);
+	if (bBottomCollided) line.set_collided_bottom(true);
 }
 
-bool GetLineRect(Line line, float rx, float ry, RECT hitbox)
+bool get_line_to_rect(Line line, float rx, float ry, RECT hitbox)
 {
-	bool bLeftSideCollided = CheckForLineToLineCollision(line, rx + hitbox.left, ry + hitbox.top, rx + hitbox.left, ry + hitbox.bottom);
-	bool bRightSideCollided = CheckForLineToLineCollision(line, rx + hitbox.right, ry + hitbox.top, rx + hitbox.right, ry + hitbox.bottom);
-	bool bTopCollided = CheckForLineToLineCollision(line, rx + hitbox.left, ry + hitbox.top, rx + hitbox.right, ry + hitbox.top);
-	bool bBottomCollided = CheckForLineToLineCollision(line, rx + hitbox.left, ry + hitbox.bottom, rx + hitbox.right, ry + hitbox.bottom);
+	bool bLeftSideCollided = line_to_line_collision(line, rx + hitbox.left, ry + hitbox.top, rx + hitbox.left, ry + hitbox.bottom);
+	bool bRightSideCollided = line_to_line_collision(line, rx + hitbox.right, ry + hitbox.top, rx + hitbox.right, ry + hitbox.bottom);
+	bool bTopCollided = line_to_line_collision(line, rx + hitbox.left, ry + hitbox.top, rx + hitbox.right, ry + hitbox.top);
+	bool bBottomCollided = line_to_line_collision(line, rx + hitbox.left, ry + hitbox.bottom, rx + hitbox.right, ry + hitbox.bottom);
 
 	if (bLeftSideCollided || bRightSideCollided || bTopCollided || bBottomCollided) return true;
 
 	return false;
 }
 
-void CollisionDetection::GroundCheck(std::shared_ptr<Player> player, std::vector<Line> lines)
+void CollisionDetection::ground_check(std::shared_ptr<Player> player, std::vector<Line> lines)
 {
-	player->SetIsInAir();
-	float playerLeft = player->GetCurPosition().x + player->GetHitboxLeft();
-	float playerRight = player->GetCurPosition().x + player->GetHitboxRight();
-	float playerBottom = player->GetCurPosition().y + player->GetHitboxBottom();
+	player->set_in_air();
+	float playerLeft = player->get_cur_position().x + player->get_hitbox_left();
+	float playerRight = player->get_cur_position().x + player->get_hitbox_right();
+	float playerBottom = player->get_cur_position().y + player->get_hitbox_bottom();
 
 	int diagonalCollisionCount = 0;
 
 	for (size_t i = 0; i < lines.size(); ++i)
 	{
-		if (lines[i].GetLineType() == LINE_TYPE_HORIZONTAL)
+		if (lines[i].get_line_type() == LINE_TYPE_HORIZONTAL)
 		{
-			float lineLeft = lines[i].GetP1().x;
-			float lineRight = lines[i].GetP2().x;
+			float lineLeft = lines[i].get_p1().x;
+			float lineRight = lines[i].get_p2().x;
 
 			if (playerLeft > lineLeft && playerLeft < lineRight || playerRight > lineLeft && playerRight < lineRight || playerLeft < lineLeft && playerRight > lineRight || playerLeft < lineRight && playerRight > lineLeft)
 			{
-				if (lines[i].GetP1().y == playerBottom)
+				if (lines[i].get_p1().y == playerBottom)
 				{
-					player->SetVelocityY(0);
-					player->SetIsOnGround();
+					player->set_velocity_y(0);
+					player->set_on_ground();
 				}
 			}
 		}
-		else if (lines[i].GetLineType() == LINE_TYPE_DIAGONAL)
+		else if (lines[i].get_line_type() == LINE_TYPE_DIAGONAL)
 		{
-			if (lines[i].GetCollidedBottom())
+			if (lines[i].get_collided_bottom())
 			{
 				++diagonalCollisionCount;
 				if (diagonalCollisionCount == 2)
 				{
-					player->SetVelocityY(0);
-					player->SetIsOnGround();
+					player->set_velocity_y(0);
+					player->set_on_ground();
 				}
 			}
 		}
 	}
 }
 
-void CollisionDetection::GetLineCollisionData(std::shared_ptr<Player> player, Line& line)
+void CollisionDetection::get_line_collision_data(std::shared_ptr<Player> player, Line& line)
 {
-	float playerLeft = player->GetCurPosition().x + player->GetHitboxLeft();
-	float playerRight = player->GetCurPosition().x + player->GetHitboxRight();
-	float playerTop = player->GetCurPosition().y + player->GetHitboxTop();
-	float playerBottom = player->GetCurPosition().y + player->GetHitboxBottom();
-	line.SetCollidedLeft(false);
-	line.SetCollidedRight(false);
-	line.SetCollidedTop(false);
-	line.SetCollidedBottom(false);
-	line.SetCollisionLength(0.0f);
+	float playerLeft = player->get_cur_position().x + player->get_hitbox_left();
+	float playerRight = player->get_cur_position().x + player->get_hitbox_right();
+	float playerTop = player->get_cur_position().y + player->get_hitbox_top();
+	float playerBottom = player->get_cur_position().y + player->get_hitbox_bottom();
+	line.set_collided_left(false);
+	line.set_collided_right(false);
+	line.set_collided_top(false);
+	line.set_collided_bottom(false);
+	line.set_collision_length(0.0f);
 
-	if (line.GetLineType() == LINE_TYPE_VERTICAL)
+	if (line.get_line_type() == LINE_TYPE_VERTICAL)
 	{
-		float lineTop = line.GetP1().y;
-		float lineBottom = line.GetP2().y;
+		float lineTop = line.get_p1().y;
+		float lineBottom = line.get_p2().y;
 
-		if (playerBottom > line.GetP1().y && playerTop < line.GetP2().y)
+		if (playerBottom > line.get_p1().y && playerTop < line.get_p2().y)
 		{
-			if (playerLeft < line.GetP1().x && playerRight > line.GetP1().x)
+			if (playerLeft < line.get_p1().x && playerRight > line.get_p1().x)
 			{
-				if (line.GetP1().x - playerLeft < playerRight - line.GetP1().x && playerLeft < line.GetP1().x)
+				if (line.get_p1().x - playerLeft < playerRight - line.get_p1().x && playerLeft < line.get_p1().x)
 				{
-					line.SetCollidedLeft(true);
-					line.SetCollisionLength(line.GetP1().x - playerLeft);
+					line.set_collided_left(true);
+					line.set_collision_length(line.get_p1().x - playerLeft);
 				}
-				else if (line.GetP1().x - playerLeft > playerRight - line.GetP1().x)
+				else if (line.get_p1().x - playerLeft > playerRight - line.get_p1().x)
 				{
-					line.SetCollidedRight(true);
-					line.SetCollisionLength(playerRight - line.GetP1().x);
+					line.set_collided_right(true);
+					line.set_collision_length(playerRight - line.get_p1().x);
 				}
 			}
 		}
 	}
-	else if (line.GetLineType() == LINE_TYPE_HORIZONTAL)
+	else if (line.get_line_type() == LINE_TYPE_HORIZONTAL)
 	{
-		float lineStart = line.GetP1().x;
-		float lineEnd = line.GetP2().x;
+		float lineStart = line.get_p1().x;
+		float lineEnd = line.get_p2().x;
 
-		if (playerLeft > line.GetP1().x && playerLeft < line.GetP2().x || playerRight > line.GetP1().x && playerRight < line.GetP2().x)
+		if (playerLeft > line.get_p1().x && playerLeft < line.get_p2().x || playerRight > line.get_p1().x && playerRight < line.get_p2().x)
 		{
-			if (line.GetP1().y - playerTop < playerBottom - line.GetP1().y)
+			if (line.get_p1().y - playerTop < playerBottom - line.get_p1().y)
 			{
-				if (line.GetP1().y - playerTop > 0)
+				if (line.get_p1().y - playerTop > 0)
 				{
-					line.SetCollidedBottom(true);
-					line.SetCollisionLength(line.GetP1().y - playerTop);
+					line.set_collided_bottom(true);
+					line.set_collision_length(line.get_p1().y - playerTop);
 				}
 			}
-			else if (line.GetP1().y - playerTop > playerBottom - line.GetP1().y)
+			else if (line.get_p1().y - playerTop > playerBottom - line.get_p1().y)
 			{
-				if (playerBottom - line.GetP1().y > 0)
+				if (playerBottom - line.get_p1().y > 0)
 				{
-					line.SetCollidedTop(true);
-					line.SetCollisionLength(playerBottom - line.GetP1().y);
+					line.set_collided_top(true);
+					line.set_collision_length(playerBottom - line.get_p1().y);
 				}
 			}
 		}
 	}
-	else if (line.GetLineType() == LINE_TYPE_DIAGONAL)
+	else if (line.get_line_type() == LINE_TYPE_DIAGONAL)
 	{
-		GetLineRectData(line, player->GetCurPosition().x, player->GetCurPosition().y, player->GetHitbox());
+		get_line_rect_data(line, player->get_cur_position().x, player->get_cur_position().y, player->get_hitbox());
 	}
 }
 
-void CollisionDetection::PosCheck(std::shared_ptr<Player> player, std::vector<Line> lines, float dt)
+void CollisionDetection::pos_check(std::shared_ptr<Player> player, std::vector<Line> lines, float dt)
 {
-	player->SetMaxPosLeft(0);
-	player->SetMaxPosRight(0);
-	player->SetMaxPosUp(0);
-	player->SetMaxPosDown(0);
+	player->set_max_pos_left(0);
+	player->set_max_pos_right(0);
+	player->set_max_pos_up(0);
+	player->set_max_pos_down(0);
 
-	float playerLeft = player->GetCurPosition().x + player->GetHitboxLeft();
-	float playerRight = player->GetCurPosition().x + player->GetHitboxRight();
-	float playerTop = player->GetCurPosition().y + player->GetHitboxTop();
-	float playerBottom = player->GetCurPosition().y + player->GetHitboxBottom();
+	float playerLeft = player->get_cur_position().x + player->get_hitbox_left();
+	float playerRight = player->get_cur_position().x + player->get_hitbox_right();
+	float playerTop = player->get_cur_position().y + player->get_hitbox_top();
+	float playerBottom = player->get_cur_position().y + player->get_hitbox_bottom();
 
 	Line closestLeftLine;
 	float valueLeft = FLT_MAX;
@@ -174,54 +174,54 @@ void CollisionDetection::PosCheck(std::shared_ptr<Player> player, std::vector<Li
 	float valueBottom = FLT_MAX;
 	for (size_t i = 0; i < lines.size(); ++i)
 	{
-		if (lines[i].GetLineType() == LINE_TYPE_VERTICAL)
+		if (lines[i].get_line_type() == LINE_TYPE_VERTICAL)
 		{
-			float lineTop = lines[i].GetP1().y;
-			float lineBottom = lines[i].GetP2().y;
+			float lineTop = lines[i].get_p1().y;
+			float lineBottom = lines[i].get_p2().y;
 
 			if (playerTop > lineTop && playerTop < lineBottom // linijos Y intervale
 				//|| playerBottom > lineTop 
 				|| playerTop < lineTop && playerBottom > lineBottom
 				|| playerTop < lineBottom && playerBottom > lineTop)
 			{
-				if (lines[i].GetP1().x <= playerLeft)
+				if (lines[i].get_p1().x <= playerLeft)
 				{
-					if (playerLeft - lines[i].GetP1().x <= valueLeft)
+					if (playerLeft - lines[i].get_p1().x <= valueLeft)
 					{
-						valueLeft = playerLeft - lines[i].GetP1().x;
+						valueLeft = playerLeft - lines[i].get_p1().x;
 						closestLeftLine = lines[i];
 					}
 				}
-				if (lines[i].GetP1().x >= playerRight)
+				if (lines[i].get_p1().x >= playerRight)
 				{
-					if (lines[i].GetP1().x - playerRight <= valueRight)
+					if (lines[i].get_p1().x - playerRight <= valueRight)
 					{
-						valueRight = lines[i].GetP1().x - playerRight;
+						valueRight = lines[i].get_p1().x - playerRight;
 						closestRightLine = lines[i];
 					}
 				}
 			}
 		}
-		else if (lines[i].GetLineType() == LINE_TYPE_HORIZONTAL)
+		else if (lines[i].get_line_type() == LINE_TYPE_HORIZONTAL)
 		{
-			float lineLeft = lines[i].GetP1().x;
-			float lineRight = lines[i].GetP2().x;
+			float lineLeft = lines[i].get_p1().x;
+			float lineRight = lines[i].get_p2().x;
 
 			if (playerLeft > lineLeft && playerLeft < lineRight || playerRight > lineLeft && playerRight < lineRight || playerLeft < lineLeft && playerRight > lineRight || playerLeft < lineRight && playerRight > lineLeft)
 			{
-				if (lines[i].GetP1().y < playerTop)
+				if (lines[i].get_p1().y < playerTop)
 				{
-					if (playerTop - lines[i].GetP1().y < valueTop)
+					if (playerTop - lines[i].get_p1().y < valueTop)
 					{
-						valueTop = playerTop - lines[i].GetP1().y;
+						valueTop = playerTop - lines[i].get_p1().y;
 						closestTopLine = lines[i];
 					}
 				}
-				if (lines[i].GetP1().y > playerTop)
+				if (lines[i].get_p1().y > playerTop)
 				{
-					if (lines[i].GetP1().y - playerTop < valueBottom)
+					if (lines[i].get_p1().y - playerTop < valueBottom)
 					{
-						valueBottom = lines[i].GetP1().y - playerTop;
+						valueBottom = lines[i].get_p1().y - playerTop;
 						closestBottomLine = lines[i];
 					}
 				}
@@ -230,23 +230,23 @@ void CollisionDetection::PosCheck(std::shared_ptr<Player> player, std::vector<Li
 	}
 	if (valueLeft < FLT_MAX)
 	{
-		player->SetMaxPosLeft(closestLeftLine.GetP1().x - 0.1f);
+		player->set_max_pos_left(closestLeftLine.get_p1().x - 0.1f);
 	}
 	if (valueRight < FLT_MAX)
 	{
-		player->SetMaxPosRight(closestRightLine.GetP1().x + 0.1f);
+		player->set_max_pos_right(closestRightLine.get_p1().x + 0.1f);
 	}
 	if (valueTop < FLT_MAX)
 	{
-		player->SetMaxPosUp(closestTopLine.GetP1().y - 0.1f);
+		player->set_max_pos_up(closestTopLine.get_p1().y - 0.1f);
 	}
 	if (valueBottom < FLT_MAX)
 	{
-		player->SetMaxPosDown(closestBottomLine.GetP1().y + 0.1f);
+		player->set_max_pos_down(closestBottomLine.get_p1().y + 0.1f);
 	}
 }
 
-Line CollisionDetection::GetPriorityCollision(std::shared_ptr<Player> player, std::vector<Line> lines)
+Line CollisionDetection::get_priority_collision(std::shared_ptr<Player> player, std::vector<Line> lines)
 {
 	Line col;
 	float value = FLT_MAX;
@@ -256,12 +256,12 @@ Line CollisionDetection::GetPriorityCollision(std::shared_ptr<Player> player, st
 
 	for (size_t i = 0; i < lines.size(); ++i)
 	{
-		if (lines[i].GetLineType() == LINE_TYPE_DIAGONAL)
+		if (lines[i].get_line_type() == LINE_TYPE_DIAGONAL)
 		{
 			// Picks colliding lines for sliding logic
-			if (lines[i].GetCollidedBottom() && lines[i].GetCollidedLeft() || // bottom left
-				lines[i].GetCollidedBottom() && lines[i].GetCollidedRight() || // bottom right
-				lines[i].GetCollidedTop() && player->GetIsGoingUp()) // top
+			if (lines[i].get_collided_bottom() && lines[i].get_collided_left() || // bottom left
+				lines[i].get_collided_bottom() && lines[i].get_collided_right() || // bottom right
+				lines[i].get_collided_top() && player->get_going_up()) // top
 			{
 				col = lines[i];
 				break; // :O
@@ -269,7 +269,7 @@ Line CollisionDetection::GetPriorityCollision(std::shared_ptr<Player> player, st
 			//
 			// Picks edges of 2 or more lines
 			//
-			if (lines[i].GetCollidedLeft())
+			if (lines[i].get_collided_left())
 			{
 				++diagonalLeftCollisionCount;
 				if (diagonalLeftCollisionCount >= 2)
@@ -278,7 +278,7 @@ Line CollisionDetection::GetPriorityCollision(std::shared_ptr<Player> player, st
 					break;
 				}
 			}
-			if (lines[i].GetCollidedRight())
+			if (lines[i].get_collided_right())
 			{
 				++diagonalRightCollisionCount;
 				if (diagonalRightCollisionCount >= 2)
@@ -287,7 +287,7 @@ Line CollisionDetection::GetPriorityCollision(std::shared_ptr<Player> player, st
 					break;
 				}
 			}
-			if (lines[i].GetCollidedBottom()) // basically if we are standing on a point of 2 or more lines, its a floor
+			if (lines[i].get_collided_bottom()) // basically if we are standing on a point of 2 or more lines, its a floor
 			{
 				++diagonalBottomCollisionCount;
 				if (diagonalBottomCollisionCount >= 2)
@@ -299,14 +299,14 @@ Line CollisionDetection::GetPriorityCollision(std::shared_ptr<Player> player, st
 		}
 		else
 		{
-			if (player->GetIsGoingDown() && lines[i].GetCollidedBottom()) continue;
-			else if (player->GetIsGoingUp() && lines[i].GetCollidedTop()) continue;
-			if (lines[i].GetCollisionLength() > 0.0f)
+			if (player->get_going_down() && lines[i].get_collided_bottom()) continue;
+			else if (player->get_going_up() && lines[i].get_collided_top()) continue;
+			if (lines[i].get_collision_length() > 0.0f)
 			{
-				if (lines[i].GetCollisionLength() < value)
+				if (lines[i].get_collision_length() < value)
 				{
 					col = lines[i];
-					value = lines[i].GetCollisionLength();
+					value = lines[i].get_collision_length();
 				}
 			}
 		}
@@ -314,146 +314,146 @@ Line CollisionDetection::GetPriorityCollision(std::shared_ptr<Player> player, st
 	return col;
 }
 
-void CollisionDetection::ApplyCollisionLogic(std::shared_ptr<Player> player, Line col, float dt)
+void CollisionDetection::apply_collision_logic(std::shared_ptr<Player> player, Line col, float dt)
 {
-	if (col.GetCollisionLength() > 0.0f)
+	if (col.get_collision_length() > 0.0f)
 	{
-		if (col.GetLineType() == LINE_TYPE_VERTICAL)
+		if (col.get_line_type() == LINE_TYPE_VERTICAL)
 		{
-			if (col.GetCollidedLeft())
+			if (col.get_collided_left())
 			{
-				if (player->GetIsOnGround())
+				if (player->get_on_ground())
 				{
-					player->SetVelocityX(0);
-					player->SetPositionX(col.GetP1().x - player->GetHitboxLeft());
+					player->set_velocity_x(0);
+					player->set_position_x(col.get_p1().x - player->get_hitbox_left());
 				}
 				else
 				{
-					player->SetBumpedLeft();
-					player->PlayBumpSound();
-					float oldVel = player->GetCurVelocity().x;
-					player->SetPositionX(col.GetP1().x - player->GetHitboxLeft());
-					player->SetVelocityX(oldVel * -1);
+					player->set_bumped_left();
+					player->play_bump_sound();
+					float oldVel = player->get_cur_velocity().x;
+					player->set_position_x(col.get_p1().x - player->get_hitbox_left());
+					player->set_velocity_x(oldVel * -1);
 				}
 			}
-			else if (col.GetCollidedRight())
+			else if (col.get_collided_right())
 			{
-				if (player->GetIsOnGround())
+				if (player->get_on_ground())
 				{
-					player->SetVelocityX(0);
-					player->SetPositionX(col.GetP1().x - player->GetHitboxRight());
+					player->set_velocity_x(0);
+					player->set_position_x(col.get_p1().x - player->get_hitbox_right());
 				}
 				else
 				{
-					player->SetBumpedRight();
-					player->PlayBumpSound();
-					float oldVel = player->GetCurVelocity().x;
-					player->SetPositionX(col.GetP1().x - player->GetHitboxRight());
-					player->SetVelocityX(oldVel * -1);
+					player->set_bumped_right();
+					player->play_bump_sound();
+					float oldVel = player->get_cur_velocity().x;
+					player->set_position_x(col.get_p1().x - player->get_hitbox_right());
+					player->set_velocity_x(oldVel * -1);
 				}
 			}
 		}
-		else if (col.GetLineType() == LINE_TYPE_HORIZONTAL)
+		else if (col.get_line_type() == LINE_TYPE_HORIZONTAL)
 		{
-			if (col.GetCollidedTop())
+			if (col.get_collided_top())
 			{
-				player->PlayLandSound();
-				player->SetPositionY(col.GetP1().y - player->GetHitboxBottom());
+				player->play_land_sound();
+				player->set_position_y(col.get_p1().y - player->get_hitbox_bottom());
 			}
-			else if (col.GetCollidedBottom())
+			else if (col.get_collided_bottom())
 			{
-				if (player->GetIsInAir())
+				if (player->get_in_air())
 				{
-					player->PlayBumpSound();
-					float oldVel = player->GetCurVelocity().y;
-					player->SetPositionY(col.GetP1().y - player->GetHitboxTop());
-					player->SetVelocityY(oldVel * -1);
+					player->play_bump_sound();
+					float oldVel = player->get_cur_velocity().y;
+					player->set_position_y(col.get_p1().y - player->get_hitbox_top());
+					player->set_velocity_y(oldVel * -1);
 				}
 			}
 		}
 	}
-	else if (col.GetLineType() == LINE_TYPE_DIAGONAL)
+	else if (col.get_line_type() == LINE_TYPE_DIAGONAL)
 	{
-		float playerLeft = player->GetCurPosition().x + player->GetHitboxLeft();
-		float playerTop = player->GetCurPosition().y + player->GetHitboxTop();
-		bool bCollideLeft = col.GetCollidedLeft();
-		bool bCollideRight = col.GetCollidedRight();
-		bool bCollideTop = col.GetCollidedTop();
-		bool bCollideBottom = col.GetCollidedBottom();
+		float playerLeft = player->get_cur_position().x + player->get_hitbox_left();
+		float playerTop = player->get_cur_position().y + player->get_hitbox_top();
+		bool bCollideLeft = col.get_collided_left();
+		bool bCollideRight = col.get_collided_right();
+		bool bCollideTop = col.get_collided_top();
+		bool bCollideBottom = col.get_collided_bottom();
 		bool bIsSlidingLeft = bCollideBottom && bCollideRight;
 		bool bIsSlidingRight = bCollideBottom && bCollideLeft;
 
 		if (bIsSlidingRight)
 		{
-			player->SetVelocityX(0);
-			player->SetVelocityY(0);
-			player->SetPositionX(player->GetCurPosition().x + 150 * dt);
-			float posY = player->GetCurPosition().y;
-			while (!GetLineRect(col, player->GetCurPosition().x, posY, player->GetHitbox()))
+			player->set_velocity_x(0);
+			player->set_velocity_y(0);
+			player->set_position_x(player->get_cur_position().x + 150 * dt);
+			float posY = player->get_cur_position().y;
+			while (!get_line_to_rect(col, player->get_cur_position().x, posY, player->get_hitbox()))
 			{
-				float posTopY = posY + player->GetHitboxTop();
-				if (posTopY + player->GetHitboxBottom() + 1 > col.GetMaxY())
+				float posTopY = posY + player->get_hitbox_top();
+				if (posTopY + player->get_hitbox_bottom() + 1 > col.get_max_y())
 				{
-					player->SetVelocityX(350);
+					player->set_velocity_x(350);
 					break;
 				}
 				posY += 1;
 			}
-			if (posY + player->GetHitboxBottom() > player->GetMaxPosDown() && player->GetMaxPosDown() != 0) posY = player->GetMaxPosDown() - player->GetHitboxBottom();
-			player->SetPositionY(posY);
+			if (posY + player->get_hitbox_bottom() > player->get_max_pos_down() && player->get_max_pos_down() != 0) posY = player->get_max_pos_down() - player->get_hitbox_bottom();
+			player->set_position_y(posY);
 		}
 		else if (bIsSlidingLeft)
 		{
-			player->SetVelocityX(0);
-			player->SetVelocityY(0);
-			player->SetPositionX(player->GetCurPosition().x - 150 * dt);
-			float posY = player->GetCurPosition().y;
-			while (!GetLineRect(col, player->GetCurPosition().x, posY, player->GetHitbox()))
+			player->set_velocity_x(0);
+			player->set_velocity_y(0);
+			player->set_position_x(player->get_cur_position().x - 150 * dt);
+			float posY = player->get_cur_position().y;
+			while (!get_line_to_rect(col, player->get_cur_position().x, posY, player->get_hitbox()))
 			{
-				float posTopY = posY + player->GetHitboxTop();
-				if (posTopY + player->GetHitboxBottom() + 1 > col.GetMaxY())
+				float posTopY = posY + player->get_hitbox_top();
+				if (posTopY + player->get_hitbox_bottom() + 1 > col.get_max_y())
 				{
-					player->SetVelocityX(-350);
+					player->set_velocity_x(-350);
 					break;
 				}
 				posY += 1;
 			}
-			if (posY + player->GetHitboxBottom() > player->GetMaxPosDown() && player->GetMaxPosDown() != 0) posY = player->GetMaxPosDown() - player->GetHitboxBottom();
-			player->SetPositionY(posY);
+			if (posY + player->get_hitbox_bottom() > player->get_max_pos_down() && player->get_max_pos_down() != 0) posY = player->get_max_pos_down() - player->get_hitbox_bottom();
+			player->set_position_y(posY);
 		}
-		else if (bCollideTop && player->GetIsGoingUp())
+		else if (bCollideTop && player->get_going_up())
 		{
-			player->SetVelocityX(0);
-			player->SetVelocityY(0);
-			float posY = player->GetCurPosition().y + (float)player->GetHitboxTop();
-			while (GetLineRect(col, playerLeft, posY, player->GetHitbox()))
+			player->set_velocity_x(0);
+			player->set_velocity_y(0);
+			float posY = player->get_cur_position().y + (float)player->get_hitbox_top();
+			while (get_line_to_rect(col, playerLeft, posY, player->get_hitbox()))
 			{
 				posY += 1;
 			}
-			player->SetPositionY(posY);
+			player->set_position_y(posY);
 		}
 		else if (bCollideLeft)
 		{
-			player->SetPositionX(col.GetMaxX() - (float)player->GetHitboxLeft());
+			player->set_position_x(col.get_max_x() - (float)player->get_hitbox_left());
 		}
 		else if (bCollideRight)
 		{
-			player->SetPositionX(col.GetMaxX() - (float)player->GetHitboxRight());
+			player->set_position_x(col.get_max_x() - (float)player->get_hitbox_right());
 		}
 		else if (bCollideBottom)
 		{
-			player->SetPositionY(col.GetMinY() - (float)player->GetHitboxBottom());
+			player->set_position_y(col.get_min_y() - (float)player->get_hitbox_bottom());
 		}
 	}
 }
 
-void CollisionDetection::Update(std::shared_ptr<Player> player, std::vector<Line> lines, float dt)
+void CollisionDetection::update(std::shared_ptr<Player> player, std::vector<Line> lines, float dt)
 {
 	for (size_t i = 0; i < lines.size(); ++i)
 	{
-		GetLineCollisionData(player, lines[i]);
+		get_line_collision_data(player, lines[i]);
 	}
-	Line col = GetPriorityCollision(player, lines);
-	ApplyCollisionLogic(player, col, dt);
-	GroundCheck(player, lines);
+	Line col = get_priority_collision(player, lines);
+	apply_collision_logic(player, col, dt);
+	ground_check(player, lines);
 }

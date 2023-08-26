@@ -1,8 +1,43 @@
 #include "Player.h"
 
-void Player::Update(float dt)
+Player::Player(std::shared_ptr<Engine> engine)
 {
-	_engine->GetKeyboardPtr()->GetInput();
+	m_engine = engine;
+	if (!m_engine)
+	{
+		MessageBoxA(NULL, "[Player]: failed to create engine obj", NULL, NULL);
+		throw std::invalid_argument("[Player]: engine not created");
+	}
+	m_cur_pos = { 535.f,737.f };
+	m_cur_vel = { 0.0f, 0.0f };
+	m_cur_gravity = { 0.0f, 1500.f };
+	m_cur_state = IDLE_RIGHT;
+	init_graphics();
+	m_cur_sprite = m_sprites[m_cur_state];
+	if (!m_cur_sprite)
+	{
+		MessageBoxA(NULL, "[Player]: cursprite was null", NULL, NULL);
+		throw std::invalid_argument("[Player]: cursprite null");
+	}
+	m_hitbox.left = 20;
+	m_hitbox.right = m_cur_sprite->get_width() - 20;
+	m_hitbox.top = 30;
+	m_hitbox.bottom = m_cur_sprite->get_height() - 10;
+	m_min_jump_force = -0.5f;
+	m_max_jump_force = -6.5f;
+	m_on_ground = false;
+	m_old_state = MOVE_RIGHT;
+	m_cur_state = FALL_RIGHT;
+	m_max_pos_up = 0;
+	m_max_pos_down = 0;
+	m_max_pos_left = 0;
+	m_max_pos_right = 0;
+	m_enable_fly_mode = false;
+}
+
+void Player::update(float dt)
+{
+	m_engine->get_keyboard_ptr()->get_input();
 
 #ifdef _DEBUG
 	if (GetAsyncKeyState('L') & 1)
@@ -11,11 +46,11 @@ void Player::Update(float dt)
 	if (!_bEnableFlyMode)
 	{
 #endif
-		Move();
-		Jump(dt);
-		ApplyVelocity(dt);
-		Gravity(dt);
-		GetSpriteForCurrentState();
+		move();
+		jump(dt);
+		apply_velocity(dt);
+		gravity(dt);
+		get_sprite_for_current_state();
 #ifdef _DEBUG
 	}
 	else
@@ -23,241 +58,244 @@ void Player::Update(float dt)
 #endif
 }
 
-void Player::Render(float dt)
+// Needs to be rewritten in a simple way
+void Player::get_sprite_for_current_state()
 {
-	_curSprite->Render(_curPos, dt);
-}
-
-void Player::GetSpriteForCurrentState()
-{
-	if (GetIsGoingLeft() && _bIsOnGround)
+	if (get_going_left() && m_on_ground)
 	{
-		_oldState = MOVE_LEFT;
-		_curSprite = _sprites[MOVE_LEFT];
+		m_old_state = MOVE_LEFT;
+		m_cur_sprite = m_sprites[MOVE_LEFT];
 	}
-	else if (GetIsGoingRight() && _bIsOnGround)
+	else if (get_going_right() && m_on_ground)
 	{
-		_oldState = MOVE_RIGHT;
-		_curSprite = _sprites[MOVE_RIGHT];
+		m_old_state = MOVE_RIGHT;
+		m_cur_sprite = m_sprites[MOVE_RIGHT];
 	}
-	else if (GetIsGoingUp() && !_bBumpedLeft && !_bBumpedRight)
+	else if (get_going_up() && !m_bumped_left && !m_bumped_right)
 	{
-		if (GetIsGoingLeft())
+		if (get_going_left())
 		{
-			_curSprite = _sprites[JUMP_LEFT];
+			m_cur_sprite = m_sprites[JUMP_LEFT];
 		}
-		else if (GetIsGoingRight())
+		else if (get_going_right())
 		{
-			_curSprite = _sprites[JUMP_RIGHT];
+			m_cur_sprite = m_sprites[JUMP_RIGHT];
 		}
 		else
 		{
-			if (_oldState == MOVE_LEFT || _oldState == BUMP_LEFT)
+			if (m_old_state == MOVE_LEFT || m_old_state == BUMP_LEFT)
 			{
-				_curSprite = _sprites[JUMP_LEFT];
+				m_cur_sprite = m_sprites[JUMP_LEFT];
 			}
-			else if (_oldState == MOVE_RIGHT || _oldState == BUMP_RIGHT)
+			else if (m_old_state == MOVE_RIGHT || m_old_state == BUMP_RIGHT)
 			{
-				_curSprite = _sprites[JUMP_RIGHT];
+				m_cur_sprite = m_sprites[JUMP_RIGHT];
 			}
 		}
 	}
-	else if (GetIsGoingDown() && !_bBumpedLeft && !_bBumpedRight)
+	else if (get_going_down() && !m_bumped_left && !m_bumped_right)
 	{
-		if (GetIsGoingLeft())
+		if (get_going_left())
 		{
-			_curSprite = _sprites[FALL_LEFT];
+			m_cur_sprite = m_sprites[FALL_LEFT];
 		}
-		else if (GetIsGoingRight())
+		else if (get_going_right())
 		{
-			_curSprite = _sprites[FALL_RIGHT];
+			m_cur_sprite = m_sprites[FALL_RIGHT];
 		}
 		else
 		{
-			if (_oldState == MOVE_LEFT || _oldState == BUMP_LEFT)
+			if (m_old_state == MOVE_LEFT || m_old_state == BUMP_LEFT)
 			{
-				_curSprite = _sprites[FALL_LEFT];
+				m_cur_sprite = m_sprites[FALL_LEFT];
 			}
-			else if (_oldState == MOVE_RIGHT || _oldState == BUMP_RIGHT)
+			else if (m_old_state == MOVE_RIGHT || m_old_state == BUMP_RIGHT)
 			{
-				_curSprite = _sprites[FALL_RIGHT];
+				m_cur_sprite = m_sprites[FALL_RIGHT];
 			}
 		}
 	}
-	else if (_bIsChargingJump)
+	else if (m_charging_jump)
 	{
-		_curSprite = _sprites[CHARGING_JUMP];
+		m_cur_sprite = m_sprites[CHARGING_JUMP];
 	}
-	else if (_bBumpedLeft && !_bIsOnGround)
+	else if (m_bumped_left && !m_on_ground)
 	{
-		_oldState = BUMP_LEFT;
-		_curSprite = _sprites[BUMP_LEFT];
+		m_old_state = BUMP_LEFT;
+		m_cur_sprite = m_sprites[BUMP_LEFT];
 	}
-	else if (_bBumpedRight && !_bIsOnGround)
+	else if (m_bumped_right && !m_on_ground)
 	{
-		_oldState = BUMP_RIGHT;
-		_curSprite = _sprites[BUMP_RIGHT];
+		m_old_state = BUMP_RIGHT;
+		m_cur_sprite = m_sprites[BUMP_RIGHT];
 	}
 	else
 	{
-		if (_oldState == MOVE_LEFT || _oldState == BUMP_LEFT || _oldState == JUMP_LEFT)
+		if (m_old_state == MOVE_LEFT || m_old_state == BUMP_LEFT || m_old_state == JUMP_LEFT)
 		{
-			_curSprite = _sprites[IDLE_LEFT];
+			m_cur_sprite = m_sprites[IDLE_LEFT];
 		}
-		else if (_oldState == MOVE_RIGHT || _oldState == BUMP_RIGHT || _oldState == JUMP_RIGHT)
+		else if (m_old_state == MOVE_RIGHT || m_old_state == BUMP_RIGHT || m_old_state == JUMP_RIGHT)
 		{
-			_curSprite = _sprites[IDLE_RIGHT];
+			m_cur_sprite = m_sprites[IDLE_RIGHT];
 		}
 	}
-	if (_bIsOnGround)
+	if (m_on_ground)
 	{
-		_bBumpedLeft = false;
-		_bBumpedRight = false;
+		m_bumped_left = false;
+		m_bumped_right = false;
 	}
 }
 
-void Player::Move()
+void Player::move()
 {
-	if (!_bIsChargingJump)
+	if (!m_charging_jump)
 	{
-		if (_bIsOnGround)
+		if (m_on_ground)
 		{
-			if (PressedLeft())
+			if (pressed_left())
 			{
-				_curVel.x = -300;
+				m_cur_vel.x = -300;
 			}
-			else if (PressedRight())
+			else if (pressed_right())
 			{
-				_curVel.x = 300;
+				m_cur_vel.x = 300;
 			}
 			else
 			{
-				_curVel = { 0,0 };
+				m_cur_vel = { 0,0 };
 			}
 		}
 	}
 	else
 	{
-		if (_bIsOnGround)
+		if (m_on_ground)
 		{
-			_curVel = { 0,0 };
+			m_cur_vel = { 0,0 };
 		}
 	}
 }
 
-void Player::Jump(float dt)
+void Player::jump(float dt)
 {
-	if (_bIsOnGround)
+	if (m_on_ground)
 	{
-		if (PressedJump())
+		if (pressed_jump())
 		{
-			GetJumpForce(dt);
+			get_jump_force(dt);
 		}
-		else if (_curJumpForce < _minJumpForce)
+		else if (m_cur_jump_force < m_min_jump_force)
 		{
-			PlayJumpSound();
+			play_jump_sound();
 
-			if (PressedLeft())
+			if (pressed_left())
 			{
-				_curVel.x = -400;
+				m_cur_vel.x = -400;
 			}
-			else if (PressedRight())
+			else if (pressed_right())
 			{
-				_curVel.x = 400;
+				m_cur_vel.x = 400;
 			}
 
-			_curVel.y = 200 * _curJumpForce;
-			_bIsOnGround = false;
-			_bIsChargingJump = false;
-			_curJumpForce = 0;
+			m_cur_vel.y = 200 * m_cur_jump_force;
+			m_on_ground = false;
+			m_charging_jump = false;
+			m_cur_jump_force = 0;
 		}
 		else
 		{
-			_bIsChargingJump = false;
-			_curJumpForce = 0;
+			m_charging_jump = false;
+			m_cur_jump_force = 0;
 		}
 	}
 }
 
-void Player::GetJumpForce(float dt)
+void Player::get_jump_force(float dt)
 {
-	_bIsChargingJump = true;
+	m_charging_jump = true;
 
-	if (_curJumpForce == 0)
+	if (m_cur_jump_force == 0)
 	{
-		_curJumpForce = _minJumpForce;
+		m_cur_jump_force = m_min_jump_force;
 	}
-	else if (_curJumpForce - dt * 10 >= _maxJumpForce)
+	else if (m_cur_jump_force - dt * 10 >= m_max_jump_force)
 	{
-		_curJumpForce -= dt * 10;
+		m_cur_jump_force -= dt * 10;
 	}
 }
 
-void Player::ApplyVelocity(float dt)
+void Player::apply_velocity(float dt)
 {
-	if (GetIsGoingLeft() && _maxPosLeft != 0 && _curPos.x + GetHitboxLeft() + _curVel.x * dt < _maxPosLeft)
+	if (get_going_left() && m_max_pos_left != 0 && m_cur_pos.x + get_hitbox_left() + m_cur_vel.x * dt < m_max_pos_left)
 	{
-		_curPos.x = _maxPosLeft - GetHitboxLeft();
+		m_cur_pos.x = m_max_pos_left - get_hitbox_left();
 	}
-	else if (GetIsGoingRight() && _maxPosRight != 0 && _curPos.x + GetHitboxRight() + _curVel.x * dt > _maxPosRight)
+	else if (get_going_right() && m_max_pos_right != 0 && m_cur_pos.x + get_hitbox_right() + m_cur_vel.x * dt > m_max_pos_right)
 	{
-		_curPos.x = _maxPosRight - GetHitboxRight();
+		m_cur_pos.x = m_max_pos_right - get_hitbox_right();
 	}
 	else
 	{
-		_curPos.x = _curPos.x + _curVel.x * dt;
+		m_cur_pos.x = m_cur_pos.x + m_cur_vel.x * dt;
 	}
 
-	if (GetIsGoingUp() && _maxPosUp != 0 && (_curPos.y + GetHitboxTop()) + _curVel.y * dt < _maxPosUp)
+	if (get_going_up() && m_max_pos_up != 0 && (m_cur_pos.y + get_hitbox_top()) + m_cur_vel.y * dt < m_max_pos_up)
 	{
-		_curPos.y = _maxPosUp - GetHitboxTop();
+		m_cur_pos.y = m_max_pos_up - get_hitbox_top();
 	}
-	else if (GetIsGoingDown() && _maxPosDown != 0 && _curPos.y + GetHitboxBottom() + _curVel.y * dt > _maxPosDown)
+	else if (get_going_down() && m_max_pos_down != 0 && m_cur_pos.y + get_hitbox_bottom() + m_cur_vel.y * dt > m_max_pos_down)
 	{
-		_curPos.y = _maxPosDown - GetHitboxBottom();
+		m_cur_pos.y = m_max_pos_down - get_hitbox_bottom();
 	}
 	else
 	{
-		_curPos.y = _curPos.y + _curVel.y * dt;
+		m_cur_pos.y = m_cur_pos.y + m_cur_vel.y * dt;
 	}
 }
 
-void Player::Fly()
+void Player::fly()
 {
-	_curVel = { 0, 0 };
-	if (PressedLeft())
-		_curPos.x -= 10;
-	else if (PressedRight())
-		_curPos.x += 10;
-	else if (PressedUp())
-		_curPos.y -= 10;
-	else if (PressedDown())
-		_curPos.y += 10;
+	m_cur_vel = { 0, 0 };
+	if (pressed_left())
+		m_cur_pos.x -= 10;
+	else if (pressed_right())
+		m_cur_pos.x += 10;
+	else if (pressed_up())
+		m_cur_pos.y -= 10;
+	else if (pressed_down())
+		m_cur_pos.y += 10;
 }
 
-void Player::Gravity(float dt)
+// Maybe needs to be moved elsewhere
+void Player::gravity(float dt)
 {
-	if (!_bIsOnGround)
+	if (!m_on_ground)
 	{
-		_curVel = _curVel + _curGravity * dt;
+		m_cur_vel = m_cur_vel + m_cur_gravity * dt;
 	}
 }
 
-bool Player::InitGraphics()
+// Needs to be moved elsewhere
+bool Player::init_graphics()
 {
 	float s_AnimationUpdateSpeed = 0.1f;
 
-	if ((_sprites[MOVE_LEFT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\runLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[MOVE_RIGHT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\run.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[JUMP_LEFT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\jumpLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[JUMP_RIGHT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\jump.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[IDLE_LEFT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\idleLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[IDLE_RIGHT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\idle.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[FALL_LEFT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\fallLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[FALL_RIGHT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\fall.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[BUMP_LEFT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\oofLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[BUMP_RIGHT] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\oof.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
-	if ((_sprites[CHARGING_JUMP] = std::make_shared<Sprite>(_engine->GetGraphicsPtr(), L"Assets\\Sprites\\squat.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((m_sprites[MOVE_LEFT] = std::make_shared<Sprite>(m_engine->get_graphics_ptr(), L"Assets\\Sprites\\runLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((m_sprites[MOVE_RIGHT] = std::make_shared<Sprite>(m_engine->get_graphics_ptr(), L"Assets\\Sprites\\run.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((m_sprites[JUMP_LEFT] = std::make_shared<Sprite>(m_engine->get_graphics_ptr(), L"Assets\\Sprites\\jumpLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((m_sprites[JUMP_RIGHT] = std::make_shared<Sprite>(m_engine->get_graphics_ptr(), L"Assets\\Sprites\\jump.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((m_sprites[IDLE_LEFT] = std::make_shared<Sprite>(m_engine->get_graphics_ptr(), L"Assets\\Sprites\\idleLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((m_sprites[IDLE_RIGHT] = std::make_shared<Sprite>(m_engine->get_graphics_ptr(), L"Assets\\Sprites\\idle.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((m_sprites[FALL_LEFT] = std::make_shared<Sprite>(m_engine->get_graphics_ptr(), L"Assets\\Sprites\\fallLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((m_sprites[FALL_RIGHT] = std::make_shared<Sprite>(m_engine->get_graphics_ptr(), L"Assets\\Sprites\\fall.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((m_sprites[BUMP_LEFT] = std::make_shared<Sprite>(m_engine->get_graphics_ptr(), L"Assets\\Sprites\\oofLeft.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((m_sprites[BUMP_RIGHT] = std::make_shared<Sprite>(m_engine->get_graphics_ptr(), L"Assets\\Sprites\\oof.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
+	if ((m_sprites[CHARGING_JUMP] = std::make_shared<Sprite>(m_engine->get_graphics_ptr(), L"Assets\\Sprites\\squat.png", 93, 103, s_AnimationUpdateSpeed)) == NULL) return false;
 
 	return true;
+}
+
+void Player::render(float dt)
+{
+	m_cur_sprite->render(m_cur_pos, dt);
 }
