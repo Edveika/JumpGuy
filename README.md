@@ -7,6 +7,7 @@ This is one of my bigger projects, and it is not finished. I want to take a brea
 * Fix collision detection - under certain condition the player might go through the wall(use collision detection Framework?)
 * DX9 causes fps drops, replace with a different api or find out what the issue is
 * Refactor - some functions are way too large, encapsulation is not very good
+* When space is pressed, the character sometimes wont jump
 
 # JumpGuy
 
