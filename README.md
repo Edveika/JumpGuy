@@ -34,8 +34,12 @@ Jump Guy is a remake of the Jump King game. It features 43 levels from the origi
   * Reach the highest point in each level by mastering the precise jumps and overcoming obstacles.
 
 # Download the game
+1. Download .zip from the [releases](https://github.com/Edveika/JumpGuy/releases/tag/BETA)
+2. Make sure you have DX9 and C++ runtime installed
+3. Extract the files
+4. Run the exe
 
-Coming soon
+**NOTE: Currently in BETA**
 
 # Dependencies
 
